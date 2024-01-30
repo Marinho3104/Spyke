@@ -1,11 +1,19 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.13)
 
 project( Spyke )
 set(CMAKE_CXX_STANDARD 17)
 
-if(EXAMPLE)
-  add_executable( Spyke "./tests/example1/main.cpp" )
+# Define files in other directories
+file( GLOB_RECURSE GPU_MANAGEMENT_FILES CONFIGURE_DEPENDS "./gpu_management/*.cpp" )
+
+
+# Executable used for the compilation
+if( GPU_MANAGEMENT )
+
+  add_executable( Spyke "./tests/gpu_management/main.cpp" ${GPU_MANAGEMENT_FILES} )
+
 else()
-  add_executable( Spyke "./tests/example2/main.cpp" )
+
 endif()
+
 
