@@ -16,4 +16,8 @@ else()
 
 endif()
 
+# External libraries
+
+find_package(OpenCL REQUIRED)
+target_link_libraries(Spyke OpenCL::OpenCL)
 
