@@ -31,7 +31,10 @@ void opencl_wrapper() {
     // Device Ids count
     cl_uint count_devices; spyke::gpu_management::opencl_wrapper::get_devices_count(platform_ids[ _ ], CL_DEVICE_TYPE_GPU, &count_devices );
 
-    std::cout << count_devices << std::endl;
+    // Device ids
+    cl_device_id device_ids[ count_devices ]; spyke::gpu_management::opencl_wrapper::get_device_ids( platform_ids[ _ ], CL_DEVICE_TYPE_GPU, count_devices, device_ids );
+
+    std::cout << *device_ids << std::endl;
 
   }
 

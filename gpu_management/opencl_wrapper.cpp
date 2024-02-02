@@ -75,3 +75,25 @@ bool spyke::gpu_management::opencl_wrapper::get_devices_count( cl_platform_id& p
     );
 
 }
+
+bool spyke::gpu_management::opencl_wrapper::get_device_ids( cl_platform_id& platform_id, cl_device_type&& device_type, const cl_uint& count, cl_device_id* device_ids ) {
+
+  return 
+    check_opencl_status(
+
+      clGetDeviceIDs(
+      
+        platform_id,
+        device_type,
+        count,
+        device_ids,
+        NULL
+
+      ),
+
+      "clGetDeviceIDs"
+
+    );
+  
+}
+
