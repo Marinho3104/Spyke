@@ -6,17 +6,37 @@
 #include <iostream>
 
 
-bool spyke::gpu_management::opencl_wrapper::check_opencl_status( int32_t&& status, const char*&& function_name ) {
+bool spyke::gpu_management::opencl_wrapper::check_opencl_status( cl_int&& status, const char*&& function_name ) {
 
   if ( status != CL_SUCCESS ) {
   
     std::cout << function_name << " opencl error with code: " << status << std::endl;
-
-    return 1;
+    
+    return 0;
 
   }
 
-  return 0; 
+  return 1; 
+
+}
+
+bool spyke::gpu_management::opencl_wrapper::get_device_info( cl_device_id& device_id, cl_device_info&& device_info, size_t&& parameter_size, void* parameter_value, size_t* parameter_size_ret ) {
+
+  return
+    check_opencl_status(
+      
+        clGetDeviceInfo(
+    
+          device_id, 
+          device_info, 
+          parameter_size,
+          parameter_value,
+          parameter_size_ret
+
+        ),
+
+        "clGetDeviceInfo"
+    );
 
 }
 
@@ -27,7 +47,7 @@ bool spyke::gpu_management::opencl_wrapper::get_platforms_count( cl_uint* count 
     
       clGetPlatformIDs(
         0, 
-        0,
+        nullptr,
         count
       ), 
 

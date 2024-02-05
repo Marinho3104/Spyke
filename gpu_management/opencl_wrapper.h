@@ -15,7 +15,11 @@ namespace spyke::gpu_management::opencl_wrapper {
   
   // Only function that dont interact with the api directly, and its duty is to confirm if the 
   // opencl function status as any error and if so handle it
-  bool check_opencl_status( int32_t&&, const char*&& );
+  bool check_opencl_status( cl_int&&, const char*&& );
+
+  // Sets the given argument with the device information  requested
+  // returns true if all successed, or false otherwise
+  bool get_device_info( cl_device_id&, cl_device_info&&, size_t&&, void*, size_t* );
 
   // Sets the given argument with the number of platforms available to use,
   // returns true if all successed, or false ortherwise

@@ -3,6 +3,15 @@ cmake_minimum_required(VERSION 3.13)
 project( Spyke )
 set(CMAKE_CXX_STANDARD 17)
 
+include( CheckCXXCompilerFlag )
+
+check_cxx_compiler_flag(-fsanitize=address ASAN_AVAILABLE )
+
+
+SET( CMAKE_CXX_FLAGS_DEBUG  "")
+SET( CMAKE_CXX_FLAGS_RELEASE  "")
+SET( CMAKE_CXX_FLAGS  "-g -fsanitize=address")
+
 
 # Define files in other directories
 file( GLOB_RECURSE GPU_MANAGEMENT_FILES CONFIGURE_DEPENDS "./gpu_management/*.cpp" )
