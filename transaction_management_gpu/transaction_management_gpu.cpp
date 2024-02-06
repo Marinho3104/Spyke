@@ -18,14 +18,11 @@ bool spyke::transaction_management_gpu::Transaction_Management_Gpu::setup() {
   // trying to get the best performance out of it
   if ( ! configuration.deep_config_set ) {
 
-    std::cout << configuration.gpu_information.platforms_count << std::endl;
     // Makes a config for all given platforms
     for ( int _ = 0; _ < configuration.gpu_information.platforms_count; _ ++ ) {
 
       // Loops to get all compute units sum of all devices in curret platform
       for ( int __ = 0; __ < configuration.gpu_information.devices_count[ _ ]; __ ++ ) {
-
-        std::cout << "Hey" << std::endl;
 
         cl_uint compute_units;
 

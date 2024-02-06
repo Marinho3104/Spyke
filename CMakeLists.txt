@@ -10,8 +10,16 @@ check_cxx_compiler_flag(-fsanitize=address ASAN_AVAILABLE )
 
 SET( CMAKE_CXX_FLAGS_DEBUG  "")
 SET( CMAKE_CXX_FLAGS_RELEASE  "")
-SET( CMAKE_CXX_FLAGS  "-g -fsanitize=address")
 
+if( SANITIZE )
+
+  SET( CMAKE_CXX_FLAGS  "-g -fsanitize=address")
+
+else()
+
+  SET( CMAKE_CXX_FLAGS  "")
+
+endif()
 
 # Define files in other directories
 file( GLOB_RECURSE GPU_MANAGEMENT_FILES CONFIGURE_DEPENDS "./gpu_management/*.cpp" )
