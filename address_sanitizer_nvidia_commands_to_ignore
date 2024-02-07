@@ -1,0 +1,2 @@
+export DisableDeepBind=1
+export NEOReadDebugKeys=1

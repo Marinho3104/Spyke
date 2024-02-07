@@ -28,6 +28,9 @@ namespace spyke::transaction_management_gpu {
     // Receives and copy the config for the setup
     Transaction_Management_Gpu( Transaction_Management_Gpu_Configuration& );
 
+    // Makes the deep configuration automaticly
+    bool set_deep_configuration();
+
     // Performs the gpu setup according to the given config
     bool setup();
 

@@ -23,9 +23,16 @@ namespace spyke::transaction_management_gpu {
 
     // Sinalize if the user have already set the deep configuration
     bool deep_config_set;
+  
+     // Number of global work items used in the execution of the Transaction Proccess kernel
+    size_t* global_work_items_transaction_proccess;  
+
 
     /** FUNCTIONS **/
 
+    // Free memory
+    ~Transaction_Management_Gpu_Configuration();
+    
     // Copies parameters 
     Transaction_Management_Gpu_Configuration( gpu_management::Gpu_Information& );
 
