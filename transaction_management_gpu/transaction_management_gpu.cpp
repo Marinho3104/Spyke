@@ -7,9 +7,13 @@
 #include <cstddef>
 #include <iostream>
 #include "./../gpu_management/opencl_wrapper.h"
+#include "transaction_management_gpu_data.h"
+
+spyke::transaction_management_gpu::Transaction_Management_Gpu::~Transaction_Management_Gpu() {}
 
 spyke::transaction_management_gpu::Transaction_Management_Gpu::Transaction_Management_Gpu( 
-    spyke::transaction_management_gpu::Transaction_Management_Gpu_Configuration& config ) : configuration( config ) {}
+    spyke::transaction_management_gpu::Transaction_Management_Gpu_Configuration& config ) 
+      : configuration( config ), gpu_data( Transaction_Management_Gpu_Data( configuration.gpu_information.platforms_count ) ) {}
 
 bool spyke::transaction_management_gpu::Transaction_Management_Gpu::set_deep_configuration() {
 
@@ -73,11 +77,10 @@ bool spyke::transaction_management_gpu::Transaction_Management_Gpu::setup() {
 
   // If no deep config were set, it sets it automatic 
   // trying to get the best performance out of it
-  if ( ! configuration.deep_config_set && set_deep_configuration() ) return 0;
+  if ( ! configuration.deep_config_set && ! set_deep_configuration() ) return 0;
 
-  
-
-  return 1;
+  // Setup Gpu Data
+  return gpu_data.setup( configuration );
 
 }
 

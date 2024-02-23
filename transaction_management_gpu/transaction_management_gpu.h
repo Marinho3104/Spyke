@@ -8,6 +8,7 @@
 
 /** INCLUDES **/
 #include "transaction_management_gpu_configuration.h"
+#include "transaction_management_gpu_data.h"
 
 
 namespace spyke::transaction_management_gpu {
@@ -23,7 +24,13 @@ namespace spyke::transaction_management_gpu {
     // Config used for the gpu setup
     Transaction_Management_Gpu_Configuration& configuration;
 
+    // Opencl variables in use
+    Transaction_Management_Gpu_Data gpu_data;
+
     /** FUNCTIONS **/
+
+    // Free memory
+    ~Transaction_Management_Gpu();
 
     // Receives and copy the config for the setup
     Transaction_Management_Gpu( Transaction_Management_Gpu_Configuration& );

@@ -19,6 +19,9 @@ namespace spyke::transaction_management_gpu {
     // Gpu resources to be used
     gpu_management::Gpu_Information& gpu_information;
 
+    // Number of transactions that will be stored in the pool
+    size_t number_transactions_pool;
+
     /** DEEP CONFIG **/
 
     // Sinalize if the user have already set the deep configuration
@@ -34,7 +37,7 @@ namespace spyke::transaction_management_gpu {
     ~Transaction_Management_Gpu_Configuration();
     
     // Copies parameters 
-    Transaction_Management_Gpu_Configuration( gpu_management::Gpu_Information& );
+    Transaction_Management_Gpu_Configuration( gpu_management::Gpu_Information&, size_t& );
 
     
 
