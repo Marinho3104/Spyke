@@ -44,6 +44,9 @@ namespace spyke::transaction_management_gpu {
     // Sets up the Proccessing Transaction Kernel
     bool setup_proccessing_transaction();
 
+    // Launches the kernels into the world!
+    bool start();
+
   };
 
 }

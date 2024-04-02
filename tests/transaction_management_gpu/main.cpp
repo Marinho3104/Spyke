@@ -18,7 +18,11 @@ int main (int argc, char *argv[]) {
   spyke::transaction_management_gpu::Transaction_Management_Gpu transaction_management_gpu =
     spyke::transaction_management_gpu::Transaction_Management_Gpu( config );
 
-  transaction_management_gpu.setup();
+  if( ! transaction_management_gpu.setup() ) return 1;
+
+  if ( ! transaction_management_gpu.start() ) return 1;
+
+  while( 1 );
 
   return 0;
 

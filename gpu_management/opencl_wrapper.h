@@ -48,6 +48,10 @@ namespace spyke::gpu_management::opencl_wrapper {
   // Sets the given argument with a new created program from a given source
   // returns true if all successed, or false otherwise
   bool set_program_with_source( cl_program&, cl_context&, cl_uint&, const char**&, const size_t*& );
+  
+  // Builds a given successful program
+  // returns true if all successed, or false otherwise
+  bool build_program( cl_program&, cl_uint&, const cl_device_id*, const char*, void ( CL_CALLBACK* )(cl_program, void* ), void* );
 
   //  Sets the given argument with a new created kernel with the given program in innit
   // returns true if all successed, or false otherwise

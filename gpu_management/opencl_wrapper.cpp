@@ -181,7 +181,7 @@ bool spyke::gpu_management::opencl_wrapper::set_program_with_source(
   // Status
   cl_int status;
 
-  program = 
+  program =
     clCreateProgramWithSource(
 
       context,
@@ -193,6 +193,40 @@ bool spyke::gpu_management::opencl_wrapper::set_program_with_source(
     );
 
   return check_opencl_status( status, "clCreateCommandQueueWithProperties" );
+
+}
+
+bool spyke::gpu_management::opencl_wrapper::build_program( cl_program& program, cl_uint& number_devices, const cl_device_id* device_ids, const char* options, void ( CL_CALLBACK* callback )( cl_program, void* ), void* user_data ) {
+
+  // Status
+  cl_int status = 
+    clBuildProgram(
+
+      program,
+      number_devices,
+      device_ids,
+      options,
+      callback,
+      user_data
+
+    );
+
+    // Get the build log of previous function to be added as addition data to the check function
+    char _build_log[12000];
+    cl_int status_2 = clGetProgramBuildInfo(
+        program, 
+        *device_ids, 
+        CL_PROGRAM_BUILD_LOG, 
+        sizeof( _build_log ), 
+        _build_log, 
+        0
+    );
+
+  if ( ! check_opencl_status( status_2, "clGetProgramBuildInfo" ) ) return 0;
+
+  if ( status != CL_SUCCESS ) std::cout << "\n\nBuild error:\n\n" << _build_log << std::endl;
+
+  return check_opencl_status( status, "clBuildProgram" );
 
 }
 
