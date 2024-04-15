@@ -34,6 +34,9 @@ namespace spyke::p2p {
     // Socket Connection hint
     int socket; void* hint;
 
+    // Finalizes and releases all memory used
+    void finalize();
+
   };
 
 }

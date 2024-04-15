@@ -22,6 +22,9 @@ namespace spyke::p2p {
     // Connected
     bool is_connected;
 
+    // Finalizes and releases all memory used
+    void finalize();
+
   };
 
 }

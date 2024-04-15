@@ -21,7 +21,10 @@ namespace spyke::p2p {
 
     // Is the server up
     bool is_up;
-    
+ 
+    // Finalizes and releases all memory used
+    void finalize();   
+
   };
 
 }
