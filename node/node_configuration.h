@@ -16,14 +16,17 @@ namespace spyke::node {
 
   struct Node_Configuration {
 
-    // Server Connection information
-    p2p::Connection server_connection;
+    // Server IP Connection information
+    p2p::IP_Connection* server_ip_connection;
 
     // Initial connections to establish
-    p2p::Connection* to_connect; uint8_t to_connect_count;
+    p2p::IP_Connection* ips_to_connect; uint8_t ips_to_connect_count;
 
     // Number of connections that will be maintain in Node
     uint8_t max_ordinary_connections, max_stable_connections;
+
+    // 
+    void finalize();
 
   };
 

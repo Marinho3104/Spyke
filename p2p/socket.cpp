@@ -13,6 +13,7 @@
 #include "IP_connection.h"
 #include "connection.h"
 #include "open_connection.h"
+#include "open_server_connection.h"
 
 
 bool spyke::p2p::make_server( Open_Server_Connection &server, int max_queue_pending_connections_length ) {
@@ -22,7 +23,7 @@ bool spyke::p2p::make_server( Open_Server_Connection &server, int max_queue_pend
   int socket_type, sizeof_hint;
 
   // IPV4
-  if ( server.connection.ip_connection_type == IP_Connection_Type::V4 ) {
+  if ( server.connection.ip_connection->type == IP_Connection_Type::V4 ) {
 
     IP_V4* ipv4 = ( IP_V4* ) server.connection.ip_connection;
 
@@ -93,7 +94,7 @@ bool spyke::p2p::establish_connection( spyke::p2p::Open_Connection& connection )
   int socket_type, sizeof_hint;
 
   // IPV4
-  if ( connection.connection.ip_connection_type == IP_Connection_Type::V4 ) {
+  if ( connection.connection.ip_connection->type == IP_Connection_Type::V4 ) {
 
     IP_V4* ipv4 = ( IP_V4* ) connection.connection.ip_connection;
 
@@ -153,3 +154,5 @@ bool spyke::p2p::close_connection( spyke::p2p::Open_Connection& connection ) {
   return close( connection.connection.socket ) != -1;
 
 }
+
+void spyke::p2p::accept_new_connection( Open_Server_Connection& server ) {}

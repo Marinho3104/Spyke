@@ -1,0 +1,3 @@
+/home/marinho/Projects/Own/Spyke/build1/CMakeFiles/Spyke.dir
+/home/marinho/Projects/Own/Spyke/build1/CMakeFiles/edit_cache.dir
+/home/marinho/Projects/Own/Spyke/build1/CMakeFiles/rebuild_cache.dir

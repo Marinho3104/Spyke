@@ -27,9 +27,13 @@ file( GLOB_RECURSE P2P_FILES CONFIGURE_DEPENDS "./p2p/*.cpp" )
 
 
 
-if(NODE)
+if(NODE1)
 
   add_executable( Spyke "./tests/node/main.cpp" ${NODE_FILES} ${P2P_FILES} )
+
+elseif(NODE2)
+
+  add_executable( Spyke "./tests/node/main1.cpp" ${NODE_FILES} ${P2P_FILES} )
 
 endif()
 

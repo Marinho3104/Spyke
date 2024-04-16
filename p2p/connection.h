@@ -14,19 +14,8 @@
 
 namespace spyke::p2p {
 
-  // Enumeration to the type of IP connection used
-  enum IP_Connection_Type {
-
-    V4 = 0,
-    V6 = 1
-
-  };
-
   // Connection Structure
   struct Connection {
-
-    // Type of the IP connection in use
-    IP_Connection_Type ip_connection_type;
 
     // Ip connection information
     IP_Connection *ip_connection;
@@ -36,6 +25,9 @@ namespace spyke::p2p {
 
     // Finalizes and releases all memory used
     void finalize();
+
+    // Compares if the socket id is the same with a given one
+    bool operator==( Connection& );
 
   };
 

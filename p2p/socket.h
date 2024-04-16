@@ -24,6 +24,9 @@ namespace spyke::p2p {
   // Close the socket and the connection of a given connection
   bool close_connection( Open_Connection& );
 
+  // Accepts a new connection
+  void accept_new_connection( Open_Server_Connection& );
+
 }
 
 #endif

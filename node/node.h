@@ -12,9 +12,19 @@
 #include "node_configuration.h"
 #include "./../p2p/open_connection.h"
 #include <sys/select.h>
+#include <semaphore.h>
+#include <sys/types.h>
 
 
 namespace spyke::node {
+
+    // Specifies which type of connection is
+    enum Connection_Type {
+    
+      Ordinary_Connection = 0,
+      Stable_Connection = 1,
+
+    };
 
     // Hold all function and variables about a Node
     struct Node {
@@ -27,6 +37,9 @@ namespace spyke::node {
 
       // Current open connections 
       p2p::Open_Connection* ordinary_connections, *stable_connections;
+
+      // Locker for the Array connections changes to be sync
+      sem_t connections_locker;
 
       // Manage all file descriptors
       fd_set file_descriptors_manager;
@@ -49,6 +62,12 @@ namespace spyke::node {
 
       // Manage every change in the socket connections
       void manage_file_descriptors();
+
+      // Adds a given connections into the connections array
+      bool add_connection( p2p::Open_Connection&, Connection_Type );
+
+      // Removes a given connection from the connections array
+      bool remove_connection( p2p::Open_Connection&, bool );
 
     };
 
