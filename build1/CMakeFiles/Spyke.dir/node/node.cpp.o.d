@@ -70,7 +70,8 @@ CMakeFiles/Spyke.dir/node/node.cpp.o: \
  /home/marinho/Projects/Own/Spyke/node/./../p2p/socket.h \
  /home/marinho/Projects/Own/Spyke/node/./../p2p/open_server_connection.h \
  /home/marinho/Projects/Own/Spyke/node/./../p2p/open_connection.h \
- /usr/include/c++/11/csignal /usr/include/signal.h \
+ /usr/include/c++/11/cstddef /usr/include/c++/11/csignal \
+ /usr/include/signal.h \
  /usr/include/x86_64-linux-gnu/bits/signum-generic.h \
  /usr/include/x86_64-linux-gnu/bits/signum-arch.h \
  /usr/include/x86_64-linux-gnu/bits/types/sig_atomic_t.h \

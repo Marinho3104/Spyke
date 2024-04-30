@@ -11,6 +11,7 @@
 /** INCLUDES **/
 #include "open_server_connection.h"
 #include "open_connection.h"
+#include <cstddef>
 
 
 namespace spyke::p2p {
@@ -25,7 +26,13 @@ namespace spyke::p2p {
   bool close_connection( Open_Connection& );
 
   // Accepts a new connection
-  void accept_new_connection( Open_Server_Connection& );
+  bool accept_new_connection( Open_Server_Connection&, Open_Connection& );
+
+  // Sends a given message to a given socket
+  bool send_message( Open_Connection&, void*, size_t );
+
+  // Receives a message from a given socket
+  void* receive_message( Open_Connection& );
 
 }
 

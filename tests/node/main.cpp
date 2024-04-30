@@ -21,7 +21,7 @@ spyke::p2p::IP_Connection* get_connect_to() {
 int main (int argc, char *argv[]) {
 
   // Ip connection information
-  spyke::p2p::IP_V4 ip_v4_server = spyke::p2p::IP_V4( 0x7f000001, 3010 );
+  spyke::p2p::IP_V4 ip_v4_server = spyke::p2p::IP_V4( 0x7f000001, 3002 );
 
   spyke::p2p::IP_Connection p = ip_v4_server;
 
@@ -42,11 +42,7 @@ int main (int argc, char *argv[]) {
 
   if ( ! node.setup() ) return 1;
 
-  // node.start();
-
-  sleep( 100 );
-
-  while( 1 );
+  node.start();
 
   node.finalize();
 

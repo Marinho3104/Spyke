@@ -6,6 +6,7 @@
 #include <bits/types/sigset_t.h>
 #include <csignal>
 #include <iostream>
+#include <pthread.h>
 #include <semaphore.h>
 #include <sys/select.h>
 #include <thread>
@@ -14,7 +15,7 @@
 
 spyke::node::Node::Node( spyke::node::Node_Configuration& configuration ) : configuration( configuration ) {
 
-  // Initialize semaphore for the connections
+  // Initialize the semaphores
   sem_init( &connections_locker, 0, 1 );
 
   // Set the server connection into the open server connection for the "make_server" function
@@ -42,13 +43,10 @@ void spyke::node::Node::finalize() {
 
 }
 
-void SIGINT_handler( int ) {
+void spyke::node::Node::stop() {
 
-  // Send the signal to all proccess in this gpid
-  // stops the manage file descriptors loop
+  // Send SIGUSR1 signal to stop the execution of manage_file_descriptors
   kill( 0, SIGUSR1 );
-
-  exit( 1 );
 
 }
 
@@ -61,8 +59,7 @@ bool spyke::node::Node::setup() {
   FD_SET( server.connection.socket, &file_descriptors_manager );
 
   // Set the SIGINT sifgnal to peacefully exit the node 
-  struct sigaction sa; sa.sa_handler = SIGINT_handler; sigemptyset( &sa.sa_mask ); sigaddset( &sa.sa_mask, SIGUSR1 ); sa.sa_flags = 0; 
-  sigaction( SIGINT, &sa, NULL );
+  sigset_t mask; sigemptyset( &mask ); sigaddset( &mask, SIGINT ); sigaddset( &mask, SIGUSR1 ); sigprocmask( SIG_SETMASK, &mask, 0 );
 
   // Memory for the connections
   ordinary_connections = ( spyke::p2p::Open_Connection* ) malloc( sizeof( spyke::p2p::Open_Connection ) * configuration.max_ordinary_connections );
@@ -98,23 +95,63 @@ void spyke::node::Node::establish_initial_connections() {
         .hint = 0,
 
       },
-      .is_connected = 0,
+      .is_connected = 1,
 
     };
 
+    // Tries to establish a connection with the given Connection IP
     if ( ! p2p::establish_connection( open_connection ) ) { open_connection.finalize(); continue; }
 
+    // If the connection succed adds it into the connections array 
     add_connection( open_connection, Ordinary_Connection );
+
+    p2p::send_message( open_connection, ( void* ) "oil", 3);
 
   }
 
 }
 
+void spyke::node::Node::TUI() {
+
+  char x;
+
+  while( 1 ) {
+
+    std::cout << "[ 0 ] - Exit" << std::endl;
+    std::cout << "\n -> ";
+
+    std::cin >> x;
+
+    switch (x) {
+
+      case '0': goto out;
+    
+    }
+
+  }
+
+  // If this part is reach means that the user wants to exit the node program 
+  // so calls the stop function to exit all threads in execution
+out: stop();
+
+}
+
 void spyke::node::Node::start() {
 
+  // Tries to establish the given initial connections
   establish_initial_connections();
 
-  std::thread( &spyke::node::Node::manage_file_descriptors, this ).detach();
+  // All proccesses arfe executed as a individual thread to make like a barrier where
+  // it only go throught when all threads finishes
+  std::thread threads[ 2 ];
+
+  threads[ 0 ] = std::thread( &spyke::node::Node::manage_file_descriptors, this );
+  threads[ 1 ] = std::thread( &spyke::node::Node::TUI, this );
+
+  for( int _ = 0; _ < 2; _ ++ ) threads[ _ ].join();
+
+  // Only reach point when all threads have finish
+  // Hopefully peacefully :)
 
 }
 
@@ -123,35 +160,65 @@ void SIGUSR1_handler( int ) {}
 
 void spyke::node::Node::manage_file_descriptors() {
 
-  // Set the handler for the SIGUSR1
-  struct sigaction sa; sa.sa_handler = SIGUSR1_handler; sigemptyset( &sa.sa_mask ); sa.sa_flags = 0; 
+  // The signal SIGUSR1 is choosed to act as a stop mechanism for the fd loop
+  // So we override the default action of SIGUSR1 to be nothing 
+  struct sigaction sa; sa.sa_handler = SIGUSR1_handler; sigemptyset( &sa.sa_mask ); sa.sa_flags = 0; sigaction( SIGUSR1, &sa, NULL );
 
-  // Set the signal up 
-  sigaction( SIGUSR1, &sa, NULL );
+  // Mask signals to override the previous mask and to accept the signal SIGUSR1
+  sigset_t pselect_mask; sigemptyset( &pselect_mask );
 
-  // Pselect mask to ignore other signals used in the code
-  sigset_t pselect_mask; sigemptyset( &pselect_mask ); sigaddset( &pselect_mask, SIGINT );
-
-  int files_count;
+  int files_count; fd_set set_sockets = file_descriptors_manager;
 
   while(
+
     ( 
-      files_count = pselect( FD_SETSIZE, &file_descriptors_manager, 0, 0, 0, &pselect_mask )
+      files_count = pselect( FD_SETSIZE, &set_sockets, 0, 0, 0, &pselect_mask )
     ) != -1
+  
   ) {
 
-    std::cout << "Hey hey" << std::endl;
+    std::cout << "Select" << std::endl;
+
+    // Server
+    if ( FD_ISSET( server.connection.socket, &set_sockets ) ) {
+
+      p2p::Open_Connection new_connection = { 0 };
+
+      if ( ! spyke::p2p::accept_new_connection( server, new_connection ) ) new_connection.finalize();
+
+      else add_connection( new_connection, Ordinary_Connection );
+
+    }
+
+    sem_wait( &connections_locker );
+
+    for ( int _ = 0; _ < configuration.max_ordinary_connections; _ ++ ) {
+
+      // Check if the connection is up and if so checks if the socket fd were not changed
+      if ( 
+        ! ordinary_connections[ _ ].is_connected || 
+        ! FD_ISSET( ordinary_connections[ _ ].connection.socket, &set_sockets ) 
+      ) continue;
+
+      p2p::receive_message( ordinary_connections[ _ ] );
+
+      std::cout << "Message received" << std::endl;
+
+    }
+
+    sem_post( &connections_locker );
+
+    set_sockets = file_descriptors_manager;
 
   }
 
-  std::cout << "out" << std::endl;
-
 }
-
 
 bool spyke::node::Node::add_connection( p2p::Open_Connection& connection, Connection_Type type ) {
 
   sem_wait( &connections_locker );
+
+  std::cout << "New connection added" << std::endl;
 
   bool rtr = 0;
 
@@ -159,7 +226,9 @@ bool spyke::node::Node::add_connection( p2p::Open_Connection& connection, Connec
 
     for ( int _ = 0; _ < configuration.max_ordinary_connections; _ ++ )
 
-      if ( ! ordinary_connections[ _ ].is_connected ) { ordinary_connections[ _ ] = connection; rtr = 1; break; }
+      if ( ! ordinary_connections[ _ ].is_connected ) 
+
+        { FD_SET( connection.connection.socket, &file_descriptors_manager ); ordinary_connections[ _ ] = connection; rtr = 1; break; }
 
   }
 
@@ -167,7 +236,9 @@ bool spyke::node::Node::add_connection( p2p::Open_Connection& connection, Connec
 
     for ( int _ = 0; _ < configuration.max_ordinary_connections; _ ++ )
 
-      if ( ! stable_connections[ _ ].is_connected ) { stable_connections[ _ ] = connection; rtr = 1; break; }
+      if ( ! stable_connections[ _ ].is_connected ) 
+
+        { FD_SET( connection.connection.socket, &file_descriptors_manager ); stable_connections[ _ ] = connection; rtr = 1; break; }
 
   }
 
@@ -212,5 +283,4 @@ bool spyke::node::Node::remove_connection( p2p::Open_Connection& connection, boo
   return rtr;
 
 }
-
 

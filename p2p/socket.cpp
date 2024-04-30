@@ -1,5 +1,6 @@
 
 /** INCLUDES **/
+#include <cstddef>
 #include <cstdio>
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -147,7 +148,6 @@ bool spyke::p2p::establish_connection( spyke::p2p::Open_Connection& connection )
 
 bool spyke::p2p::close_connection( spyke::p2p::Open_Connection& connection ) {
 
-  // Check if the current socket id differs from -1
   if ( connection.connection.socket == -1 ) return 0;
 
   // Tries to close the socket file descriptor
@@ -155,4 +155,81 @@ bool spyke::p2p::close_connection( spyke::p2p::Open_Connection& connection ) {
 
 }
 
-void spyke::p2p::accept_new_connection( Open_Server_Connection& server ) {}
+bool spyke::p2p::accept_new_connection( Open_Server_Connection& server, Open_Connection& new_connection ) {
+
+  void* hint; socklen_t hint_size;
+
+  // Check the server ip connection type
+  // Cause if it is IPV4 for easier implementation
+  // it will only accept IPV4 connections as well
+  // But if it is IPV6 it accept either IPV4 or IPV6 
+  // but the hint will always sockaddr_in6 cause it can
+  // represent IPV$ and IPV6
+  if ( server.connection.ip_connection->type == V4 ) 
+  
+    { new_connection.connection.hint = malloc( sizeof( sockaddr_in ) ); hint_size = sizeof( sockaddr_in ); }
+  
+  else 
+    
+    { new_connection.connection.hint = malloc( sizeof( sockaddr_in6 ) ); hint_size = sizeof( sockaddr_in6 ); }
+
+
+  // Check for error
+  if (
+
+    (
+
+      new_connection.connection.socket = accept( 
+
+        server.connection.socket, 
+        ( sockaddr* ) new_connection.connection.hint, 
+        &hint_size 
+      
+      ) 
+    
+    ) == -1
+
+  ) return 0;
+
+  new_connection.is_connected = 1;
+
+  return 1;
+
+}
+
+bool spyke::p2p::send_message( Open_Connection& connection, void* data, size_t data_size ) {
+
+  int status = send(
+
+    connection.connection.socket,
+    data, data_size,
+    0
+
+  );
+    
+  return status != -1;
+
+}
+
+void* spyke::p2p::receive_message( Open_Connection& connection ) { 
+
+  char data[4];
+
+  int status =
+    recv(
+
+      connection.connection.socket,
+      data,
+      3,
+      0
+
+    );
+
+  data[ 3 ] = 0;
+
+  std::cout << data << std::endl;
+
+  return 0;
+
+}
+

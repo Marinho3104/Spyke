@@ -41,6 +41,9 @@ namespace spyke::node {
       // Locker for the Array connections changes to be sync
       sem_t connections_locker;
 
+      // Locker for the Manage file descriptors loop
+      sem_t close_manage_file_descriptors_locker;
+
       // Manage all file descriptors
       fd_set file_descriptors_manager;
 
@@ -51,6 +54,9 @@ namespace spyke::node {
       // Finalizes and releases all memory used
       void finalize();
 
+      // Stops all threads proccessing in execution to exit the Node peacefully
+      void stop();
+
       // Performs the initial setup when the config file is set
       bool setup();
 
@@ -59,6 +65,9 @@ namespace spyke::node {
       
       // Starts all the proccessing for a normal execution of a Node
       void start();
+
+      // Tui for user inputs
+      void TUI();
 
       // Manage every change in the socket connections
       void manage_file_descriptors();

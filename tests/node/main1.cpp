@@ -3,6 +3,7 @@
 #include "./../../node/node_configuration.h"
 #include "./../../p2p/connection.h"
 #include <iostream>
+#include <unistd.h>
 
 int main (int argc, char *argv[]) {
 
@@ -29,8 +30,6 @@ int main (int argc, char *argv[]) {
   if ( ! node.setup() ) return 1;
 
   node.start();
-
-  while( 1 );
 
   node.finalize();
 
