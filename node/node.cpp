@@ -105,8 +105,6 @@ void spyke::node::Node::establish_initial_connections() {
     // If the connection succed adds it into the connections array 
     add_connection( open_connection, Ordinary_Connection );
 
-    p2p::send_message( open_connection, ( void* ) "oil", 3);
-
   }
 
 }
@@ -177,8 +175,6 @@ void spyke::node::Node::manage_file_descriptors() {
   
   ) {
 
-    std::cout << "Select" << std::endl;
-
     // Server
     if ( FD_ISSET( server.connection.socket, &set_sockets ) ) {
 
@@ -200,9 +196,10 @@ void spyke::node::Node::manage_file_descriptors() {
         ! FD_ISSET( ordinary_connections[ _ ].connection.socket, &set_sockets ) 
       ) continue;
 
-      p2p::receive_message( ordinary_connections[ _ ] );
+      void* message = p2p::receive_message( ordinary_connections[ _ ] );
 
-      std::cout << "Message received" << std::endl;
+      // Removes connection if message has an error
+      if ( ! message ) { remove_connection( ordinary_connections[ _ ], true ); continue; }
 
     }
 
@@ -216,9 +213,7 @@ void spyke::node::Node::manage_file_descriptors() {
 
 bool spyke::node::Node::add_connection( p2p::Open_Connection& connection, Connection_Type type ) {
 
-  sem_wait( &connections_locker );
-
-  std::cout << "New connection added" << std::endl;
+  // sem_wait( &connections_locker );
 
   bool rtr = 0;
 
@@ -242,7 +237,7 @@ bool spyke::node::Node::add_connection( p2p::Open_Connection& connection, Connec
 
   }
 
-  sem_post( &connections_locker );
+  // sem_post( &connections_locker );
 
   return rtr;
 
@@ -250,13 +245,15 @@ bool spyke::node::Node::add_connection( p2p::Open_Connection& connection, Connec
 
 bool spyke::node::Node::remove_connection( p2p::Open_Connection& connection, bool call_finalize ) {
 
-  sem_wait( &connections_locker );
+  // sem_wait( &connections_locker );
 
   bool rtr = 0;
 
   for ( int _ = 0; _ < configuration.max_ordinary_connections; _ ++ )
 
     if ( ordinary_connections[ _ ].connection == connection.connection ) { 
+
+      FD_CLR( ordinary_connections[ _ ].connection.socket, &file_descriptors_manager );
 
       if ( call_finalize ) ordinary_connections[ _ ].finalize(); 
 
@@ -266,9 +263,11 @@ bool spyke::node::Node::remove_connection( p2p::Open_Connection& connection, boo
 
     }
 
-  for ( int _ = 0; _ < configuration.max_ordinary_connections; _ ++ )
+  for ( int _ = 0; _ < configuration.max_stable_connections; _ ++ )
 
     if ( stable_connections[ _ ].connection == connection.connection ) {
+
+      FD_CLR( stable_connections[ _ ].connection.socket, &file_descriptors_manager );
 
       if ( call_finalize ) stable_connections[ _ ].finalize();
 
@@ -278,7 +277,7 @@ bool spyke::node::Node::remove_connection( p2p::Open_Connection& connection, boo
     
     }
 
-  sem_post( &connections_locker );
+  // sem_post( &connections_locker );
 
   return rtr;
 

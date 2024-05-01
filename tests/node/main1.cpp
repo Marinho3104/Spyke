@@ -8,7 +8,7 @@
 int main (int argc, char *argv[]) {
 
   // Ip connection information
-  spyke::p2p::IP_V4 ip_v4_server = spyke::p2p::IP_V4( 0x7f000001, 3003 );
+  spyke::p2p::IP_V4 ip_v4_server = spyke::p2p::IP_V4( 0x7f000001, 3006 );
 
   spyke::p2p::IP_Connection p = ip_v4_server;
 

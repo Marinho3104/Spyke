@@ -225,11 +225,11 @@ void* spyke::p2p::receive_message( Open_Connection& connection ) {
 
     );
 
+  if ( status == -1 ) return 0;
+
   data[ 3 ] = 0;
 
-  std::cout << data << std::endl;
-
-  return 0;
+  return data;
 
 }
 
