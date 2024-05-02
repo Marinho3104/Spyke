@@ -1,0 +1,9 @@
+[submodule "libs/cipher"]
+	path = libs/cipher
+	url = https://github.com/mygityf/cipher.git
+[submodule "build/libs/ed25519"]
+	path = build/libs/ed25519
+	url = https://github.com/orlp/ed25519.git
+[submodule "libs/ed25519"]
+	path = libs/ed25519
+	url = https://github.com/orlp/ed25519.git
