@@ -48,6 +48,9 @@ namespace spyke::types {
     // Verifies if the setted checksum if correct for the given id and type set
     bool verify_checksum();
 
+    // Converts the address data into a binary representation
+    void binary_representation( char* );
+
     // Converts the address data into a Hexadecimal string "human representation"
     void hexadecimal_representation( char* );
 
@@ -55,8 +58,8 @@ namespace spyke::types {
     // Returns the number of bytes used in a id given a address type
     static unsigned char get_id_bytes( Address_Types& );
 
-    // Returns the number of bytes used in the hexadecimal representation given a address type
-    static unsigned char get_hexadecimal_bytes( Address_Types& );
+    // Returns the number of bytes used in the binary representation given a address type
+    static unsigned char get_binary_bytes( Address_Types& );
 
     // Creates an address of type NORMAL given the public key
     static void create_address_type_NORMAL( unsigned char[ 32 ], Address& );
@@ -69,9 +72,9 @@ namespace spyke::types {
 
 // Normal type
 #define NORMAL_TYPE_ADDRESS_ID_SIZE 64
-#define NORMAL_TYPE_ADDRESS_HEXADECIMAL_REPRESENTATION ( 1 + NORMAL_TYPE_ADDRESS_ID_SIZE + 2 ) * 2 /* Type - 1 bytes | Checksum - 2 bytes */
+#define NORMAL_TYPE_ADDRESS_BINARY_REPRESENTATION ( 1 + NORMAL_TYPE_ADDRESS_ID_SIZE + 2 ) /* Type - 1 bytes | Checksum - 2 bytes */
 
 // Short type
 #define SHORT_TYPE_ADDRESS_ID_SIZE 32
-#define SHORT_TYPE_ADDRESS_HEXADECIMAL_REPRESENTATION ( 1 + SHORT_TYPE_ADDRESS_ID_SIZE + 2 ) * 2 /* Type - 1 bytes | Checksum - 2 bytes */
+#define SHORT_TYPE_ADDRESS_BINARY_REPRESENTATION ( 1 + SHORT_TYPE_ADDRESS_ID_SIZE + 2 ) /* Type - 1 bytes | Checksum - 2 bytes */
 

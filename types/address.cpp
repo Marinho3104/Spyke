@@ -5,7 +5,6 @@
 #include <climits>
 #include <cstdint>
 #include <cstring>
-#include <iostream>
 
 spyke::types::Address::Address() {}
 
@@ -39,6 +38,14 @@ bool spyke::types::Address::verify_checksum() {
   checksum = checksum_to_verify;
 
   return result;
+
+}
+
+void spyke::types::Address::binary_representation( char* representation ) {
+
+  memcpy( representation, &type, 2 ); representation += 2;
+  memcpy( representation, id, get_id_bytes( type ) ); representation += get_id_bytes( type );
+  memcpy( representation, &checksum, 2 );
 
 }
 
@@ -79,12 +86,12 @@ unsigned char spyke::types::Address::get_id_bytes( Address_Types& type ) {
 
 }
 
-unsigned char spyke::types::Address::get_hexadecimal_bytes( Address_Types& type ) {
+unsigned char spyke::types::Address::get_binary_bytes( Address_Types& type ) {
 
   switch ( type ) {
 
-    case spyke::types::Address_Types::NORMAL: return NORMAL_TYPE_ADDRESS_HEXADECIMAL_REPRESENTATION;
-    case spyke::types::Address_Types::SHORT: return SHORT_TYPE_ADDRESS_HEXADECIMAL_REPRESENTATION;
+    case spyke::types::Address_Types::NORMAL: return NORMAL_TYPE_ADDRESS_BINARY_REPRESENTATION;
+    case spyke::types::Address_Types::SHORT: return SHORT_TYPE_ADDRESS_BINARY_REPRESENTATION;
   
   }
 

@@ -1,10 +1,8 @@
 
 #include <cstdio>
-#include <cstring>
 #include <iostream>
 #include <sys/types.h>
 #include "./../../types/address.h"
-#include "./../../libs/cipher/cipher/sha512.h"
 #include "./../../libs/ed25519/src/ed25519.h"
 
 void create_address_NORMAL() {
@@ -24,7 +22,7 @@ void create_address_NORMAL() {
 
   spyke::types::Address::create_address_type_NORMAL( public_key, address );
   
-  char repre[ spyke::types::Address::get_hexadecimal_bytes( type ) ];
+  char repre[ spyke::types::Address::get_binary_bytes( type ) * 2 ];
 
   address.hexadecimal_representation( repre );
 
