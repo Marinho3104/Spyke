@@ -17,7 +17,9 @@ else()
 
 endif()
 
-add_executable( ${PROJECT_NAME} ./tests/types/main.cpp )
+
+file(GLOB SPYKE_TYPES "./types/*")
+add_executable( ${PROJECT_NAME} ./tests/types/main.cpp ${SPYKE_TYPES} )
 
 
 add_subdirectory( ./libs/cipher )
