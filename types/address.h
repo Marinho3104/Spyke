@@ -15,7 +15,7 @@
 namespace spyke::types {
 
   // Enum for all types of transaction
-  enum Address_Types {
+  enum Address_Types : unsigned char {
 
     NORMAL = 0,
     SHORT = 1,
@@ -63,6 +63,9 @@ namespace spyke::types {
 
     // Creates an address of type NORMAL given the public key
     static void create_address_type_NORMAL( unsigned char[ 32 ], Address& );
+
+    // Fills a given address with all information given the binary representation of it
+    static bool fill_address( char*, uint16_t&, Address& );
 
   };
 

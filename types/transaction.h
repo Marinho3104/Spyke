@@ -30,10 +30,6 @@ namespace spyke::types {
     // Signature of the sender
     unsigned char signature[ 64 ];
 
-    // The transaction is complete or not
-    bool complete;
-
-
     // Constructor to initiate a transaction that is still not complete ( not accepted in the blockchain )
     // which means the parameter balance_after is still unknown
     Transaction( Address&, Address&, uint64_t, uint64_t );
@@ -41,8 +37,14 @@ namespace spyke::types {
     // Constructor to initiate a transaction that is complete 
     Transaction( Address&, Address&, uint64_t&, uint64_t&, uint64_t&, unsigned char* );
 
+    // Returns the number of bytes used in the binary representation to be sign
+    uint32_t get_binary_sign_bytes();
+
     // Returns the number of bytes used in the binary representation
     uint32_t get_binary_bytes();
+
+    // Sets the raw transaction representation to sign the transaction into a given variable
+    void binary_representation_sign( char* );
 
     // Sets the raw transaction representation into a given variable
     void binary_representation( char* );

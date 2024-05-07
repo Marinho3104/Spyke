@@ -5,10 +5,11 @@
 #include <climits>
 #include <cstdint>
 #include <cstring>
+#include <iostream>
 
 spyke::types::Address::Address() {}
 
-spyke::types::Address::Address( unsigned char* id, Address_Types type ) : type( type ) { memcpy( this->id, id, get_id_bytes( type ) ); }
+spyke::types::Address::Address( unsigned char* id, Address_Types type ) : type( type ) { memcpy( this->id, id, get_id_bytes( type ) ); set_checksum(); }
 
 void spyke::types::Address::set_checksum() {
 
@@ -25,6 +26,8 @@ void spyke::types::Address::set_checksum() {
   checksum += type;
 
   if ( checksum >= USHRT_MAX ) checksum %= USHRT_MAX;
+
+  this->checksum = checksum;
 
 }
 
@@ -43,7 +46,7 @@ bool spyke::types::Address::verify_checksum() {
 
 void spyke::types::Address::binary_representation( char* representation ) {
 
-  memcpy( representation, &type, 2 ); representation += 2;
+  memcpy( representation, &type, 1 ); representation += 1;
   memcpy( representation, id, get_id_bytes( type ) ); representation += get_id_bytes( type );
   memcpy( representation, &checksum, 2 );
 
@@ -82,7 +85,7 @@ unsigned char spyke::types::Address::get_id_bytes( Address_Types& type ) {
   
   }
 
-  return -1;
+  return 0;
 
 }
 
@@ -95,7 +98,7 @@ unsigned char spyke::types::Address::get_binary_bytes( Address_Types& type ) {
   
   }
 
-  return -1;
+  return 0;
 
 }
 
@@ -113,6 +116,27 @@ void spyke::types::Address::create_address_type_NORMAL( unsigned char public_key
   address = Address( out2, Address_Types::NORMAL );
 
 }
+
+bool spyke::types::Address::fill_address( char* address_data, uint16_t& address_data_size, Address& address ) {
+
+  // Check if atleast one byte ( address type ) is given in the address data
+  if ( address_data_size < 2 ) return 0;
+
+  address.type = *( Address_Types* ) address_data;
+
+  // Check if the given address data size is the same as the one needed
+  // for the type given
+  if ( get_binary_bytes( address.type ) != address_data_size ) return 0;
+
+  memcpy( address.id, address_data + 1, get_id_bytes( address.type ) );
+  address.checksum = *( uint16_t* ) ( address_data + 1 + get_id_bytes( address.type ) );
+
+  // Returns the last operation which checks if the checksum 
+  // is correct for the data given if so everything is correct
+  return address.verify_checksum();
+
+}
+
 
 
 
