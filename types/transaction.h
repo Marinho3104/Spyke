@@ -30,15 +30,21 @@ namespace spyke::types {
     // Signature of the sender
     unsigned char signature[ 64 ];
 
+    // Extra data used to carry extra information to the transaction confirmation fase
+    void* extra_data = 0; uint16_t extra_data_size = 0;
+
     // Default
     Transaction();
 
     // Constructor to initiate a transaction that is still not complete ( not accepted in the blockchain )
     // which means the parameter balance_after is still unknown
-    Transaction( Address&, Address&, uint64_t, uint64_t );
+    Transaction( Address&, Address&, uint64_t, uint64_t, void*, uint16_t );
 
     // Constructor to initiate a transaction that is complete 
     Transaction( Address&, Address&, uint64_t&, uint64_t&, uint64_t&, unsigned char* );
+
+    // Finalizes and releases all memory used
+    void finalize();
 
     // Verifies if the signature set is correct given the rest of information set
     bool verify_signature();
