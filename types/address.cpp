@@ -5,7 +5,6 @@
 #include <climits>
 #include <cstdint>
 #include <cstring>
-#include <iostream>
 
 spyke::types::Address::Address() {}
 
