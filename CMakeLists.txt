@@ -13,7 +13,7 @@ if( SANITIZE )
 
 else()
 
-  SET( CMAKE_CXX_FLAGS  "")
+  SET( CMAKE_CXX_FLAGS  "-g")
 
 endif()
 

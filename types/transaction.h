@@ -25,7 +25,7 @@ namespace spyke::types {
     // After the transaction is accepted and insert into the blockchain
     // The balance_after correspond to the amount of balance that the
     // sender have after the transaction
-    uint64_t balance_after;
+    uint64_t balance_after = 0;
 
     // Signature of the sender
     unsigned char signature[ 64 ];
@@ -38,7 +38,7 @@ namespace spyke::types {
 
     // Constructor to initiate a transaction that is still not complete ( not accepted in the blockchain )
     // which means the parameter balance_after is still unknown
-    Transaction( Address&, Address&, uint64_t, uint64_t, void*, uint16_t );
+    Transaction( Address&, uint64_t, uint64_t, void*, uint16_t );
 
     // Constructor to initiate a transaction that is complete 
     Transaction( Address&, Address&, uint64_t&, uint64_t&, uint64_t&, unsigned char* );
@@ -46,8 +46,18 @@ namespace spyke::types {
     // Finalizes and releases all memory used
     void finalize();
 
+    // Converts the extra data information into the from Address
+    bool set_from_address();
+
+    // Converts the extra data information into the from address ( Address type NORMAL )
+    bool set_from_address_type_NORMAL();
+
+
     // Verifies if the signature set is correct given the rest of information set
     bool verify_signature();
+
+    // Verifies if the signature is correct for a NORMAL address signature
+    bool verify_signature_type_NORMAL( unsigned char* );
 
     // Returns the number of bytes used in the binary representation to be sign
     uint32_t get_binary_sign_bytes();
@@ -61,8 +71,20 @@ namespace spyke::types {
     // Sets the raw transaction representation into a given variable
     void binary_representation( char* );
 
+
+    // Fills a given transaction with all information given the binary representation of it ( Transaction not Confirmed )
+    static bool fill_transaction_not_confirmed( char*, uint32_t&, Transaction& );
+
+    // Fills a given transaction with all information given the binary representation of it ( Transaction Confirmed )
+    static bool fill_transaction_confirmed( char*, uint32_t&, Transaction& );
+
   };
 
 }
 
 #endif
+
+// Extra data size for Address from type NORMAL
+#define EXTRA_DATA_SIZE_TYPE_NORMAL 33
+
+

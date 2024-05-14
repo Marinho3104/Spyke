@@ -18,13 +18,15 @@ void spyke::types::Address::set_checksum() {
 
   int checksum = 0;
 
-  for ( int _ = 0; _ < get_id_bytes( type ) / 2; _ += 2 )
+  for ( int _ = 0; _ < get_id_bytes( type ); _ += 2 )
 
     checksum += *( uint16_t* ) ( id + _ );
 
   checksum += type;
 
-  if ( checksum >= USHRT_MAX ) checksum %= USHRT_MAX;
+  if ( checksum >= USHRT_MAX ) 
+
+    checksum %= USHRT_MAX;
 
   this->checksum = checksum;
 
@@ -75,7 +77,7 @@ void spyke::types::Address::hexadecimal_representation( char* representation ) {
 
 
 
-unsigned char spyke::types::Address::get_id_bytes( Address_Types& type ) {
+uint8_t spyke::types::Address::get_id_bytes( Address_Types& type ) {
 
   switch ( type ) {
 
@@ -88,7 +90,7 @@ unsigned char spyke::types::Address::get_id_bytes( Address_Types& type ) {
 
 }
 
-unsigned char spyke::types::Address::get_binary_bytes( Address_Types& type ) {
+uint8_t spyke::types::Address::get_binary_bytes( Address_Types& type ) {
 
   switch ( type ) {
 
@@ -109,23 +111,23 @@ void spyke::types::Address::create_address_type_NORMAL( unsigned char public_key
   // result mak it pass again more 2 times totalling 3 times passing throught the sha512
 
   unsigned char out0[ 64 ]; SHA512_Simple( public_key, 32, out0 );
-  unsigned char out1[ 64 ]; SHA512_Simple( out1, 64, out1 );
-  unsigned char out2[ 64 ]; SHA512_Simple( out2, 64, out2 );
+  unsigned char out1[ 64 ]; SHA512_Simple( out0, 64, out1 );
+  unsigned char out2[ 64 ]; SHA512_Simple( out1, 64, out2 );
 
   address = Address( out2, Address_Types::NORMAL );
 
 }
 
-bool spyke::types::Address::fill_address( char* address_data, uint16_t& address_data_size, Address& address ) {
+bool spyke::types::Address::fill_address( char* address_data, uint32_t& address_data_size, Address& address ) {
 
   // Check if atleast one byte ( address type ) is given in the address data
   if ( address_data_size < 2 ) return 0;
 
   address.type = *( Address_Types* ) address_data;
 
-  // Check if the given address data size is the same as the one needed
+  // Check if the given address data size is enought as the one needed
   // for the type given
-  if ( get_binary_bytes( address.type ) != address_data_size ) return 0;
+  if ( address_data_size < get_binary_bytes( address.type ) ) return 0;
 
   memcpy( address.id, address_data + 1, get_id_bytes( address.type ) );
   address.checksum = *( uint16_t* ) ( address_data + 1 + get_id_bytes( address.type ) );

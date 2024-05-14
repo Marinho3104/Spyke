@@ -56,16 +56,16 @@ namespace spyke::types {
 
 
     // Returns the number of bytes used in a id given a address type
-    static unsigned char get_id_bytes( Address_Types& );
+    static uint8_t get_id_bytes( Address_Types& );
 
     // Returns the number of bytes used in the binary representation given a address type
-    static unsigned char get_binary_bytes( Address_Types& );
+    static uint8_t get_binary_bytes( Address_Types& );
 
     // Creates an address of type NORMAL given the public key
     static void create_address_type_NORMAL( unsigned char[ 32 ], Address& );
 
     // Fills a given address with all information given the binary representation of it
-    static bool fill_address( char*, uint16_t&, Address& );
+    static bool fill_address( char*, uint32_t&, Address& );
 
   };
 

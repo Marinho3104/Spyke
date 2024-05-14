@@ -30,7 +30,7 @@ bool create_ed25519_key_pair( unsigned char public_key[ 32 ], unsigned char priv
       return 0;
   }
 
-  ed25519_create_keypair(public_key, private_key, seed);
+  ed25519_create_keypair( public_key, private_key, seed);
 
   return 1;
 
@@ -71,7 +71,7 @@ void check_conversion( spyke::types::Address& address ) {
   std::cout << std::endl;
 
   spyke::types::Address addr2 = spyke::types::Address();
-  uint16_t size_addrbin = sizeof( bin_representation );
+  uint32_t size_addrbin = sizeof( bin_representation );
 
   // Check if conversion is successful
   assert( spyke::types::Address::fill_address( bin_representation, size_addrbin, addr2 ) == 1 );

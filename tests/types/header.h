@@ -23,4 +23,9 @@ void address_tests();
 void transaction_tests();
 
 // Create a transaction 
-void create_transaction( spyke::types::Transaction&, spyke::types::Address& );
+void create_transaction( spyke::types::Transaction&, spyke::types::Address&, unsigned char[ 32 ] );
+
+void sign_transaction( spyke::types::Transaction&, unsigned char[ 32 ], unsigned char[ 64 ] );
+
+// Checks Transaction conversion between Struct Object type and Binary
+void check_conversion( spyke::types::Transaction& );
