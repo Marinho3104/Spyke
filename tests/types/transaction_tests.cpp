@@ -28,8 +28,11 @@ void transaction_tests() {
   check_conversion( transaction );
   std::cout << "Done\n" << std::endl;
 
-  transaction.finalize();
+  std::cout << "Checking Transaction confirmed conversion and Struct to Binary ..." << std::endl;
+  transaction_confirmed( transaction );
+  std::cout << "Done\n" << std::endl;
 
+  transaction.finalize();
 }
 
 void create_transaction( spyke::types::Transaction& transaction, spyke::types::Address& address, unsigned char public_key[ 32 ] ) {
@@ -93,6 +96,35 @@ void check_conversion( spyke::types::Transaction& transaction ) {
   std::cout << std::endl;
 
   assert( transaction_copy.verify_signature() == 1 );
+
+  transaction_copy.finalize();
+
+}
+
+void transaction_confirmed( spyke::types::Transaction& transaction ) {
+
+  // Converts a transaction not confirmed into a confirmed one
+  transaction.finalize();
+
+  char bin_representation[ transaction.get_binary_bytes() ]; transaction.binary_representation( bin_representation );
+
+  std::cout << "Original binary representation: ";
+
+  for ( int _ = 0; _ < transaction.get_binary_bytes(); _ ++ ) std::cout << ( int ) bin_representation[ _ ] << " ";
+
+  std::cout << std::endl;
+
+  spyke::types::Transaction transaction_copy; uint32_t sizetranscopy = sizeof( bin_representation );
+  
+  assert( spyke::types::Transaction::fill_transaction_confirmed( bin_representation, sizetranscopy, transaction_copy ) == 1 );
+
+  char bin_representation_copy[ transaction_copy.get_binary_bytes() ]; transaction_copy.binary_representation( bin_representation_copy );
+
+  std::cout << "Copied binary representation: ";
+
+  for ( int _ = 0; _ < transaction_copy.get_binary_bytes(); _ ++ ) std::cout << ( int ) bin_representation_copy[ _ ] << " ";
+
+  std::cout << std::endl;
 
   transaction_copy.finalize();
 

@@ -13,8 +13,8 @@ spyke::types::Transaction::Transaction() {}
 spyke::types::Transaction::Transaction( Address& to, uint64_t amount, uint64_t fee, void* extra_data, uint16_t extra_data_size )
   : from( Address() ), to( to ), amount( amount ), fee( fee ), extra_data( malloc( extra_data_size ) ), extra_data_size( extra_data_size ) { memcpy( this->extra_data, extra_data, extra_data_size ); }
 
-spyke::types::Transaction::Transaction( Address& from, Address& to, uint64_t& amount, uint64_t& fee, uint64_t& balance_after, unsigned char* signature )
-  : from( from ), to( to ), amount( amount ), fee( fee ), balance_after( balance_after ) { memcpy( this->signature, signature, 64 ); }
+spyke::types::Transaction::Transaction( Address& from, Address& to, uint64_t& amount, uint64_t& fee, uint64_t& balance_after )
+  : from( from ), to( to ), amount( amount ), fee( fee ), balance_after( balance_after ) {}
 
 void spyke::types::Transaction::finalize() { free( extra_data ); extra_data = 0; extra_data_size = 0; }
 
@@ -93,7 +93,7 @@ uint32_t spyke::types::Transaction::get_binary_bytes() {
   // If not, means is a confirmed transaction
   return 
     from.get_binary_bytes( from.type ) + to.get_binary_bytes( to.type ) +
-      sizeof( amount ) * 3 + sizeof( signature );
+      sizeof( amount ) * 3;
 
 }
 
@@ -115,13 +115,13 @@ void spyke::types::Transaction::binary_representation( char* representation ) {
   to.binary_representation( representation ); representation += to.get_binary_bytes( to.type ); 
   memcpy( representation, &amount, sizeof( amount ) ); representation += sizeof( amount );
   memcpy( representation, &fee, sizeof( fee ) ); representation += sizeof( fee );
+
   if ( ! extra_data_size ) { memcpy( representation, &balance_after, sizeof( balance_after ) ); representation += sizeof( balance_after ); }
-  memcpy( representation, signature, sizeof( signature ) ); 
 
   // Only if is a not confirmed transaction we include the extra data
-  if ( extra_data_size ) {
+  else { 
 
-    representation += sizeof( signature );
+    memcpy( representation, signature, sizeof( signature ) ); representation += sizeof( signature );
     memcpy( representation, &extra_data_size, sizeof( extra_data_size ) ); representation += sizeof( extra_data_size );
     memcpy( representation, extra_data, extra_data_size );
 
@@ -185,17 +185,16 @@ bool spyke::types::Transaction::fill_transaction_confirmed( char* data, uint32_t
   data += to.get_binary_bytes( to.type ); data_size -= to.get_binary_bytes( to.type );
 
   // Check if there is still space for the rest of the information
-  if ( data_size < sizeof( amount ) * 3 + sizeof( signature ) ) return 0;
+  if ( data_size < sizeof( amount ) * 3 ) return 0;
 
   // Get the rest of the fields
-  uint64_t amount, fee, balance_after; unsigned char signature[ 64 ];
+  uint64_t amount, fee, balance_after;
 
   memcpy( &amount, data, sizeof( amount ) ); data += sizeof( amount );
   memcpy( &fee, data, sizeof( fee ) ); data += sizeof( fee );
   memcpy( &balance_after, data, sizeof( balance_after ) ); data += sizeof( balance_after );
-  memcpy( signature, data, sizeof( signature ) );
 
-  transaction = Transaction( from, to, amount, fee, balance_after, signature );
+  transaction = Transaction( from, to, amount, fee, balance_after );
 
   return 1;
 

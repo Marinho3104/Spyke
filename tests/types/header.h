@@ -29,3 +29,6 @@ void sign_transaction( spyke::types::Transaction&, unsigned char[ 32 ], unsigned
 
 // Checks Transaction conversion between Struct Object type and Binary
 void check_conversion( spyke::types::Transaction& );
+
+// Checks if a given transaction confirmed works well 
+void transaction_confirmed( spyke::types::Transaction& );

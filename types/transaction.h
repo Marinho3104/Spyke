@@ -41,9 +41,10 @@ namespace spyke::types {
     Transaction( Address&, uint64_t, uint64_t, void*, uint16_t );
 
     // Constructor to initiate a transaction that is complete 
-    Transaction( Address&, Address&, uint64_t&, uint64_t&, uint64_t&, unsigned char* );
+    Transaction( Address&, Address&, uint64_t&, uint64_t&, uint64_t& );
 
     // Finalizes and releases all memory used
+    // Calling this function on a Transaction Not Confirmed converts it into a Transaction Confirmed
     void finalize();
 
     // Converts the extra data information into the from Address
