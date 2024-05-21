@@ -18,7 +18,6 @@ namespace spyke::types {
   enum Address_Types : unsigned char {
 
     NORMAL = 0,
-    SHORT = 1,
 
   };
 
@@ -28,7 +27,7 @@ namespace spyke::types {
     // Address id
     // Always takes the max possible size for id of all types 
     // so it always have space
-    unsigned char id[ 64 ];
+    unsigned char id[ 28 ];
 
     // Address type
     Address_Types type;
@@ -74,10 +73,6 @@ namespace spyke::types {
 #endif
 
 // Normal type
-#define NORMAL_TYPE_ADDRESS_ID_SIZE 64
+#define NORMAL_TYPE_ADDRESS_ID_SIZE 28
 #define NORMAL_TYPE_ADDRESS_BINARY_REPRESENTATION ( 1 + NORMAL_TYPE_ADDRESS_ID_SIZE + 2 ) /* Type - 1 bytes | Checksum - 2 bytes */
-
-// Short type
-#define SHORT_TYPE_ADDRESS_ID_SIZE 32
-#define SHORT_TYPE_ADDRESS_BINARY_REPRESENTATION ( 1 + SHORT_TYPE_ADDRESS_ID_SIZE + 2 ) /* Type - 1 bytes | Checksum - 2 bytes */
 

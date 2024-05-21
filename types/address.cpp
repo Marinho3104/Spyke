@@ -1,6 +1,6 @@
 
 /** INCLUDES **/
-#include "./../libs/cipher/cipher/sha512.h"
+#include "./../libs/cipher/cipher/sha224.h"
 #include "address.h"
 #include <climits>
 #include <cstdint>
@@ -82,7 +82,6 @@ uint8_t spyke::types::Address::get_id_bytes( Address_Types& type ) {
   switch ( type ) {
 
     case spyke::types::Address_Types::NORMAL: return NORMAL_TYPE_ADDRESS_ID_SIZE;
-    case spyke::types::Address_Types::SHORT: return SHORT_TYPE_ADDRESS_ID_SIZE;
   
   }
 
@@ -95,7 +94,6 @@ uint8_t spyke::types::Address::get_binary_bytes( Address_Types& type ) {
   switch ( type ) {
 
     case spyke::types::Address_Types::NORMAL: return NORMAL_TYPE_ADDRESS_BINARY_REPRESENTATION;
-    case spyke::types::Address_Types::SHORT: return SHORT_TYPE_ADDRESS_BINARY_REPRESENTATION;
   
   }
 
@@ -110,9 +108,9 @@ void spyke::types::Address::create_address_type_NORMAL( unsigned char public_key
   // The algorithm to generate the id is simply pass the public_key to the sha512 and then with the 
   // result mak it pass again more 2 times totalling 3 times passing throught the sha512
 
-  unsigned char out0[ 64 ]; SHA512_Simple( public_key, 32, out0 );
-  unsigned char out1[ 64 ]; SHA512_Simple( out0, 64, out1 );
-  unsigned char out2[ 64 ]; SHA512_Simple( out1, 64, out2 );
+  unsigned char out0[ 28 ]; SHA224_Simple( public_key, 32, out0 );
+  unsigned char out1[ 28 ]; SHA224_Simple( out0, 28, out1 );
+  unsigned char out2[ 28 ]; SHA224_Simple( out1, 28, out2 );
 
   address = Address( out2, Address_Types::NORMAL );
 

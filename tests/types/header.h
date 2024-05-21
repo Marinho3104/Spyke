@@ -32,3 +32,7 @@ void check_conversion( spyke::types::Transaction& );
 
 // Checks if a given transaction confirmed works well 
 void transaction_confirmed( spyke::types::Transaction& );
+
+/** BLOCK TESTS **/
+
+
