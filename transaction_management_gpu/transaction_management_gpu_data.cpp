@@ -8,7 +8,9 @@
 #include <iostream>
 #include <CL/cl.h>
 
-spyke::transaction_management_gpu::Transaction_Management_Gpu_Data::~Transaction_Management_Gpu_Data() { 
+spyke::transaction_management_gpu::Transaction_Management_Gpu_Data::~Transaction_Management_Gpu_Data() {}
+
+void spyke::transaction_management_gpu::Transaction_Management_Gpu_Data::finalize() {
 
   // Loop to free all opencl variables
   for ( int _ = 0; _ < platform_count; _++ ) {
@@ -26,6 +28,9 @@ spyke::transaction_management_gpu::Transaction_Management_Gpu_Data::~Transaction
     clReleaseProgram( programs[ _ ] );
 
     for ( int __ = 0; __ < TRANSACTION_MANAGEMENT_KERNELS_COUNT; __ ++ ) kernels[ _ ][ __ ].~Kernel();
+
+    clReleaseMemObject( transaction_pool[ _ ] ); 
+    clReleaseMemObject( balance_pool[ _ ] );
     
     free( kernels[ _ ] );
 
@@ -35,7 +40,7 @@ spyke::transaction_management_gpu::Transaction_Management_Gpu_Data::~Transaction
 
   for ( int _ = 0; _ < TRANSACTION_MANAGEMENT_CL_PROGRAMS_FILE_PATH_COUNT; _++ ) free( ( char* ) program_codes[ _ ] );
 
-  free( program_codes );
+  free( program_codes ); free( transaction_pool ); free( balance_pool );
 
 }
 
@@ -44,12 +49,25 @@ spyke::transaction_management_gpu::Transaction_Management_Gpu_Data::Transaction_
     main_command_queues( ( cl_command_queue* ) malloc( sizeof( cl_command_queue ) * platform_count ) ), 
       acquire_command_queues( ( cl_command_queue* ) malloc( sizeof( cl_command_queue ) * platform_count ) ), 
         programs( ( cl_program* ) malloc( sizeof( cl_program ) * platform_count ) ), kernels( ( Kernel** ) malloc( sizeof( Kernel* ) * platform_count ) ), 
-          program_codes( ( const char** ) calloc( sizeof( char* ), TRANSACTION_MANAGEMENT_CL_PROGRAMS_FILE_PATH_COUNT ) ) {
+          program_codes( ( const char** ) calloc( sizeof( char* ), TRANSACTION_MANAGEMENT_CL_PROGRAMS_FILE_PATH_COUNT ) ),
+            transaction_pool( ( cl_mem* ) malloc( sizeof( cl_mem ) * platform_count ) ), balance_pool( ( cl_mem* ) malloc( sizeof( cl_mem ) * platform_count ) ) {
 
             // Allocate memory for the kernels of each platform
             for ( int _ = 0; _ < platform_count; _++ ) 
 
               kernels[ _ ] = ( Kernel* ) malloc( sizeof( Kernel ) * TRANSACTION_MANAGEMENT_KERNELS_COUNT);
+
+}
+
+bool spyke::transaction_management_gpu::Transaction_Management_Gpu_Data::setup_global_cl_memory( size_t& transaction_pool_size, size_t& balance_pool_size ) {
+
+  for ( int _ = 0; _ < platform_count; _ ++ ) 
+    if( 
+      ! gpu_management::opencl_wrapper::set_buffer( transaction_pool[ _ ], contexts[ _ ], CL_MEM_ALLOC_HOST_PTR | CL_MEM_READ_WRITE, transaction_pool_size, 0 ) ||
+      ! gpu_management::opencl_wrapper::set_buffer( balance_pool[ _ ], contexts[ _ ], CL_MEM_ALLOC_HOST_PTR | CL_MEM_READ_WRITE, balance_pool_size, 0 ) 
+    ) return 0;
+
+  return 1;
 
 }
 
@@ -133,6 +151,7 @@ bool spyke::transaction_management_gpu::Transaction_Management_Gpu_Data::setup_a
   return 1;
 
 }
+
 bool spyke::transaction_management_gpu::Transaction_Management_Gpu_Data::setup_kernels() {
 
   return (
@@ -237,6 +256,8 @@ bool spyke::transaction_management_gpu::Transaction_Management_Gpu_Data::setup( 
     ) return 0;
 
   }
+
+  if ( ! setup_global_cl_memory( configuration.transactions_pool_size, configuration.balance_pool_size ) ) return 0;
 
   if ( ! setup_kernels() ) return 0;
 

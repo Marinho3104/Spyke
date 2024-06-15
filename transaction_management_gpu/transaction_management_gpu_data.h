@@ -9,6 +9,7 @@
 /** INCLUDES **/
 #include "transaction_management_gpu_configuration.h"
 #include <CL/cl.h>
+#include <cstddef>
 
 namespace spyke::transaction_management_gpu {
 
@@ -41,12 +42,26 @@ namespace spyke::transaction_management_gpu {
     // specific platform
     Kernel** kernels;
 
+    // Transaction pool 
+    cl_mem* transaction_pool;
+
+    // Global address to be shared between gpu threads
+    // Main goal is to have a way of globally know how much 
+    // balance a given address currently have without the need for a I/O operations in files
+    cl_mem* balance_pool;
+
     /** FUNCTIONS **/
     
     ~Transaction_Management_Gpu_Data();
 
+    // Frees all memory used
+    void finalize();
+
     // Allocates all memory needed and setups up cl programs codes into variables
     Transaction_Management_Gpu_Data( size_t );
+
+    // Setup global cl memory
+    bool setup_global_cl_memory( size_t&, size_t& );
 
     // Setup all cl programs code
     bool setup_cl_program_code();

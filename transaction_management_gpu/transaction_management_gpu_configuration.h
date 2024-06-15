@@ -19,8 +19,15 @@ namespace spyke::transaction_management_gpu {
     // Gpu resources to be used
     gpu_management::Gpu_Information& gpu_information;
 
-    // Number of transactions that will be stored in the pool
-    size_t number_transactions_pool;
+    // Transactions pool byte size
+    size_t transactions_pool_size;
+
+    // Balance pool byte size
+    size_t balance_pool_size;
+
+
+
+
 
     /** DEEP CONFIG **/
 
@@ -33,11 +40,14 @@ namespace spyke::transaction_management_gpu {
 
     /** FUNCTIONS **/
 
-    // Free memory
+    // Destructor default
     ~Transaction_Management_Gpu_Configuration();
-    
+ 
+    // Frees all memory used
+    void finalize();   
+
     // Copies parameters 
-    Transaction_Management_Gpu_Configuration( gpu_management::Gpu_Information&, size_t& );
+    Transaction_Management_Gpu_Configuration( gpu_management::Gpu_Information&, size_t&, size_t& );
 
     
 

@@ -29,8 +29,11 @@ namespace spyke::transaction_management_gpu {
 
     /** FUNCTIONS **/
 
-    // Free memory
+    // Destructor default
     ~Transaction_Management_Gpu();
+
+    // Frees all memory used
+    void finalize();
 
     // Receives and copy the config for the setup
     Transaction_Management_Gpu( Transaction_Management_Gpu_Configuration& );
