@@ -14,7 +14,7 @@ spyke::types::Transaction::Transaction( Address& to, uint64_t amount, uint64_t f
   : from( Address() ), to( to ), amount( amount ), fee( fee ), extra_data( malloc( extra_data_size ) ), extra_data_size( extra_data_size ) { memcpy( this->extra_data, extra_data, extra_data_size ); }
 
 spyke::types::Transaction::Transaction( Address& from, Address& to, uint64_t& amount, uint64_t& fee, uint64_t& balance_after )
-  : from( from ), to( to ), amount( amount ), fee( fee ), balance_after( balance_after ) {}
+  : from( from ), to( to ), amount( amount ), fee( fee ) {}
 
 void spyke::types::Transaction::finalize() { free( extra_data ); extra_data = 0; extra_data_size = 0; }
 
@@ -93,7 +93,7 @@ uint32_t spyke::types::Transaction::get_binary_bytes() {
   // If not, means is a confirmed transaction
   return 
     from.get_binary_bytes( from.type ) + to.get_binary_bytes( to.type ) +
-      sizeof( amount ) * 3;
+      sizeof( amount ) * 2;
 
 }
 
@@ -116,10 +116,8 @@ void spyke::types::Transaction::binary_representation( char* representation ) {
   memcpy( representation, &amount, sizeof( amount ) ); representation += sizeof( amount );
   memcpy( representation, &fee, sizeof( fee ) ); representation += sizeof( fee );
 
-  if ( ! extra_data_size ) { memcpy( representation, &balance_after, sizeof( balance_after ) ); representation += sizeof( balance_after ); }
-
   // Only if is a not confirmed transaction we include the extra data
-  else { 
+  if ( extra_data_size ) {
 
     memcpy( representation, signature, sizeof( signature ) ); representation += sizeof( signature );
     memcpy( representation, &extra_data_size, sizeof( extra_data_size ) ); representation += sizeof( extra_data_size );

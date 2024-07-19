@@ -22,11 +22,6 @@ namespace spyke::types {
     // Amount that were spent and the fee payed
     uint64_t amount, fee;
 
-    // After the transaction is accepted and insert into the blockchain
-    // The balance_after correspond to the amount of balance that the
-    // sender have after the transaction
-    uint64_t balance_after = 0;
-
     // Signature of the sender
     unsigned char signature[ 64 ];
 
