@@ -91,34 +91,20 @@ bool spyke::transaction_management_gpu::Transaction_Management_Gpu::start() {
 
   std::cout << "*** Starting Kernels ***\n" << std::endl;
 
-  size_t sizes[] = { 1 };
-  size_t sizes1[] = { 1 };
+  size_t sizes[] = { 2 };
 
   // Loop throught out each platform to start the kernels
   for( int _ = 0; _ < configuration.gpu_information.platforms_count; _++ ) {
 
     // Transaction Proccessing kernel
     if (
-      ! spyke::gpu_management::opencl_wrapper::launch_kernel(
-
-        gpu_data.acquire_command_queues[ _ ],
-        gpu_data.kernels[ _ ][ TRANSACTION_MANAGEMENT_KERNELS_INDEX_ACQUIRE_THREAD ].kernel,
-        1,
-        0,
-        sizes1,
-        sizes,
-        0,
-        0,
-        0
-
-      ) || 
-      ! spyke::gpu_management::opencl_wrapper::launch_kernel(
+     ! spyke::gpu_management::opencl_wrapper::launch_kernel(
 
         gpu_data.main_command_queues[ _ ],
         gpu_data.kernels[ _ ][ TRANSACTION_MANAGEMENT_KERNELS_INDEX_TRANSACTION_PROCCESSING ].kernel,
         1,
         0,
-        sizes1,
+        sizes,
         sizes,
         0,
         0,

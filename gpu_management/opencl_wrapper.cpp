@@ -211,20 +211,25 @@ bool spyke::gpu_management::opencl_wrapper::build_program( cl_program& program, 
 
     );
 
+  if ( status != CL_SUCCESS ) {
+
     // Get the build log of previous function to be added as addition data to the check function
     char _build_log[12000];
+
     cl_int status_2 = clGetProgramBuildInfo(
-        program, 
-        *device_ids, 
-        CL_PROGRAM_BUILD_LOG, 
-        sizeof( _build_log ), 
-        _build_log, 
-        0
+      program, 
+      *device_ids, 
+      CL_PROGRAM_BUILD_LOG, 
+      sizeof( _build_log ), 
+      _build_log, 
+      0
     );
 
-  if ( ! check_opencl_status( status_2, "clGetProgramBuildInfo" ) ) return 0;
+    if ( ! check_opencl_status( status_2, "clGetProgramBuildInfo" ) ) return 0;
 
-  if ( status != CL_SUCCESS ) std::cout << "\n\nBuild error:\n\n" << _build_log << std::endl;
+    std::cout << "\n\nBuild error:\n\n" << _build_log << std::endl;
+
+  }
 
   return check_opencl_status( status, "clBuildProgram" );
 

@@ -42,12 +42,9 @@ namespace spyke::transaction_management_gpu {
     // specific platform
     Kernel** kernels;
 
-    // Transaction pool 
-    cl_mem* transaction_pool;
-
     // Global address to be shared between gpu threads
     // Main goal is to have a way of globally know how much 
-    // balance a given address currently have without the need for a I/O operations in files
+    // balance a given address currently have without the need for a I/O operations
     cl_mem* balance_pool;
 
     /** FUNCTIONS **/
@@ -61,7 +58,7 @@ namespace spyke::transaction_management_gpu {
     Transaction_Management_Gpu_Data( size_t );
 
     // Setup global cl memory
-    bool setup_global_cl_memory( size_t&, size_t& );
+    bool setup_global_cl_memory( size_t*, void* );
 
     // Setup all cl programs code
     bool setup_cl_program_code();
@@ -89,11 +86,10 @@ namespace spyke::transaction_management_gpu {
 
     /** FUNCTIONS **/
 
-    // Destructor
-    ~Kernel();
-
     // Constructor intiates the variables needed given the information provided
     Kernel();
+
+    void  finalize();
 
   };
 

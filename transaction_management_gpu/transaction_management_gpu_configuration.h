@@ -19,16 +19,6 @@ namespace spyke::transaction_management_gpu {
     // Gpu resources to be used
     gpu_management::Gpu_Information& gpu_information;
 
-    // Transactions pool byte size
-    size_t transactions_pool_size;
-
-    // Balance pool byte size
-    size_t balance_pool_size;
-
-
-
-
-
     /** DEEP CONFIG **/
 
     // Sinalize if the user have already set the deep configuration
@@ -37,6 +27,8 @@ namespace spyke::transaction_management_gpu {
      // Number of global work items used in the execution of the Transaction Proccess kernel
     size_t* global_work_items_transaction_proccess;  
 
+    // Address of the mmap function pointer for the Balance pool
+    void* balance_pool_ptr;
 
     /** FUNCTIONS **/
 
@@ -47,7 +39,7 @@ namespace spyke::transaction_management_gpu {
     void finalize();   
 
     // Copies parameters 
-    Transaction_Management_Gpu_Configuration( gpu_management::Gpu_Information&, size_t&, size_t& );
+    Transaction_Management_Gpu_Configuration( gpu_management::Gpu_Information& );
 
     
 

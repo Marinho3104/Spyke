@@ -3,8 +3,10 @@
 #include "./../../gpu_management/gpu_information.h"
 #include "./../../transaction_management_gpu/transaction_management_gpu_configuration.h"
 #include "./../../transaction_management_gpu/transaction_management_gpu.h"
+#include <cstddef>
 #include <iostream>
 #include <sys/mman.h>
+#include <unistd.h>
 
 int main (int argc, char *argv[]) {
 
@@ -12,11 +14,8 @@ int main (int argc, char *argv[]) {
 
   if ( ! spyke::gpu_management::Gpu_Information::set_available_information( gpu_information ) ) return 1; 
 
-  size_t number_transactions_pool = 128;
-  size_t balance_pool = 5000;
-
   spyke::transaction_management_gpu::Transaction_Management_Gpu_Configuration config = 
-    spyke::transaction_management_gpu::Transaction_Management_Gpu_Configuration( gpu_information, number_transactions_pool, balance_pool );
+    spyke::transaction_management_gpu::Transaction_Management_Gpu_Configuration( gpu_information );
 
   spyke::transaction_management_gpu::Transaction_Management_Gpu transaction_management_gpu =
     spyke::transaction_management_gpu::Transaction_Management_Gpu( config );
@@ -24,8 +23,6 @@ int main (int argc, char *argv[]) {
   if( ! transaction_management_gpu.setup() ) return 1;
 
   if ( ! transaction_management_gpu.start() ) return 1;
-
-  std::cout << "Out" << std::endl;
 
   transaction_management_gpu.finalize();
 
