@@ -253,7 +253,7 @@ bool spyke::gpu_management::opencl_wrapper::set_kernel(cl_kernel& kernel, cl_pro
 
 }
 
-bool spyke::gpu_management::opencl_wrapper::set_buffer(cl_mem& memory, cl_context& context, const cl_mem_flags&& flags, size_t& size, void* host_pointer ) {
+bool spyke::gpu_management::opencl_wrapper::set_buffer(cl_mem& memory, cl_context& context, const cl_mem_flags&& flags, size_t size, void* host_pointer ) {
 
   // Status
   cl_int status;
@@ -273,7 +273,7 @@ bool spyke::gpu_management::opencl_wrapper::set_buffer(cl_mem& memory, cl_contex
 
 }
 
-bool spyke::gpu_management::opencl_wrapper::set_kernel_argument(cl_kernel& kernel, cl_uint& index, size_t& size, const void* value ) {
+bool spyke::gpu_management::opencl_wrapper::set_kernel_argument(cl_kernel& kernel, cl_uint index, size_t size, const void* value ) {
   
   return
     check_opencl_status(

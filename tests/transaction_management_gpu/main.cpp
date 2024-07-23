@@ -22,7 +22,10 @@ int main (int argc, char *argv[]) {
 
   if( ! transaction_management_gpu.setup() ) return 1;
 
-  if ( ! transaction_management_gpu.start() ) return 1;
+  unsigned char transaction_data[ 7 ] = { 101, 2, 3, 4, 5, 6, 7 };
+  unsigned int transaction_data_size = 7;
+
+  transaction_management_gpu.confirmed_transaction( transaction_data, transaction_data_size );
 
   transaction_management_gpu.finalize();
 

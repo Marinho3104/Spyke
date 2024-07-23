@@ -30,6 +30,9 @@ namespace spyke::transaction_management_gpu {
     // Address of the mmap function pointer for the Balance pool
     void* balance_pool_ptr;
 
+    // Balance pool locker
+    char balance_pool_locker;
+
     /** FUNCTIONS **/
 
     // Destructor default

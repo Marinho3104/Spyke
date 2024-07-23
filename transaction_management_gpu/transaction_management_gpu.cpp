@@ -7,6 +7,7 @@
 #include <CL/cl_platform.h>
 #include <cstddef>
 #include <iostream>
+#include <unistd.h>
 #include "./../gpu_management/opencl_wrapper.h"
 #include "transaction_management_gpu_data.h"
 
@@ -87,7 +88,77 @@ bool spyke::transaction_management_gpu::Transaction_Management_Gpu::setup() {
 
 }
 
-bool spyke::transaction_management_gpu::Transaction_Management_Gpu::start() {
+bool spyke::transaction_management_gpu::Transaction_Management_Gpu::confirmed_transaction( void* transaction_data, unsigned int transaction_data_size ) {
+
+  size_t sizes[] = { 3 };
+
+  // Loop throught out each platform to try and start the threads
+  for( int _ = 0; _ < configuration.gpu_information.platforms_count; _++ ) {
+  
+    cl_mem transaction_data_cl_mem;
+
+    if(
+
+      ! spyke::gpu_management::opencl_wrapper::set_buffer(
+
+        transaction_data_cl_mem,
+        gpu_data.contexts[ _ ],
+        CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+        transaction_data_size,
+        transaction_data
+
+      )
+
+    ) return 0;
+
+    if(
+
+      ! spyke::gpu_management::opencl_wrapper::set_kernel_argument(
+
+        gpu_data.kernels[ _ ][ TRANSACTION_MANAGEMENT_KERNELS_INDEX_TRANSACTION_PROCCESSING ].kernel,
+        2,
+        sizeof( void* ),
+        &transaction_data_cl_mem
+
+      ) ||
+
+      ! spyke::gpu_management::opencl_wrapper::set_kernel_argument(
+
+        gpu_data.kernels[ _ ][ TRANSACTION_MANAGEMENT_KERNELS_INDEX_TRANSACTION_PROCCESSING ].kernel,
+        3,
+        sizeof( transaction_data_size ),
+        &transaction_data_size
+
+      )
+
+    ) return 0;
+ 
+    // Transaction Proccessing kernel
+    if (
+     ! spyke::gpu_management::opencl_wrapper::launch_kernel(
+
+        gpu_data.main_command_queues[ _ ],
+        gpu_data.kernels[ _ ][ TRANSACTION_MANAGEMENT_KERNELS_INDEX_TRANSACTION_PROCCESSING ].kernel,
+        1,
+        0,
+        sizes,
+        sizes,
+        0,
+        0,
+        0
+
+      )
+
+    ) return 0;   
+
+  }
+
+  return 1;
+
+}
+
+/*
+bool start() {
 
   std::cout << "*** Starting Kernels ***\n" << std::endl;
 
@@ -120,4 +191,4 @@ bool spyke::transaction_management_gpu::Transaction_Management_Gpu::start() {
 
   return 1;
 
-}
+}*/

@@ -47,6 +47,10 @@ namespace spyke::transaction_management_gpu {
     // balance a given address currently have without the need for a I/O operations
     cl_mem* balance_pool;
 
+    // Global address to sinalize when a thread is using/updating the
+    // balance pool
+    cl_mem* balance_pool_locker;
+
     /** FUNCTIONS **/
     
     ~Transaction_Management_Gpu_Data();
@@ -58,7 +62,7 @@ namespace spyke::transaction_management_gpu {
     Transaction_Management_Gpu_Data( size_t );
 
     // Setup global cl memory
-    bool setup_global_cl_memory( size_t*, void* );
+    bool setup_global_cl_memory( size_t*, void*, char* );
 
     // Setup all cl programs code
     bool setup_cl_program_code();

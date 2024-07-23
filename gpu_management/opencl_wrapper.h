@@ -59,11 +59,11 @@ namespace spyke::gpu_management::opencl_wrapper {
 
   // Sets the given argument with a new created buffer for the given context and with the given value
   // returns true if all successed, or false otherwise
-  bool set_buffer( cl_mem&, cl_context&, const cl_mem_flags&&, size_t&, void* );
+  bool set_buffer( cl_mem&, cl_context&, const cl_mem_flags&&, size_t, void* );
 
   // Sets a new argument for the given kernel
   // returns true if all successed, or false otherwise
-  bool set_kernel_argument( cl_kernel&, cl_uint&, size_t&, const void* );
+  bool set_kernel_argument( cl_kernel&, cl_uint, size_t, const void* );
 
   // Launches a given kernel with specification given
   // returns true if all successed, or false otherwise

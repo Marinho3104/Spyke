@@ -5,7 +5,6 @@
 #include "transaction_management_gpu_configuration.h"
 #include "./../gpu_management/opencl_wrapper.h"
 #include "./../utils/utils.h"
-#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -20,7 +19,7 @@ void spyke::transaction_management_gpu::Transaction_Management_Gpu_Data::finaliz
 
     for ( int __ = 0; __ < TRANSACTION_MANAGEMENT_KERNELS_COUNT; __ ++ ) kernels[ _ ][ __ ].finalize();
 
-    clReleaseMemObject( balance_pool[ _ ] );
+    clReleaseMemObject( balance_pool[ _ ] ); clReleaseMemObject( balance_pool_locker[ _ ] );
     
     // Release the program used
     clReleaseProgram( programs[ _ ] );
@@ -42,7 +41,7 @@ void spyke::transaction_management_gpu::Transaction_Management_Gpu_Data::finaliz
 
   for ( int _ = 0; _ < TRANSACTION_MANAGEMENT_CL_PROGRAMS_FILE_PATH_COUNT; _++ ) free( ( char* ) program_codes[ _ ] );
 
-  free( program_codes ); free( balance_pool );
+  free( program_codes ); free( balance_pool ); free( balance_pool_locker );
 
 }
 
@@ -52,7 +51,7 @@ spyke::transaction_management_gpu::Transaction_Management_Gpu_Data::Transaction_
       acquire_command_queues( ( cl_command_queue* ) malloc( sizeof( cl_command_queue ) * platform_count ) ), 
         programs( ( cl_program* ) malloc( sizeof( cl_program ) * platform_count ) ), kernels( ( Kernel** ) malloc( sizeof( Kernel* ) * platform_count ) ), 
           program_codes( ( const char** ) calloc( sizeof( char* ), TRANSACTION_MANAGEMENT_CL_PROGRAMS_FILE_PATH_COUNT ) ),
-            balance_pool( ( cl_mem* ) malloc( sizeof( cl_mem ) * platform_count ) ) {
+            balance_pool( ( cl_mem* ) malloc( sizeof( cl_mem ) * platform_count ) ), balance_pool_locker( ( cl_mem* ) malloc( sizeof( cl_mem ) * platform_count ) ) {
 
             // Allocate memory for the kernels of each platform
             for ( int _ = 0; _ < platform_count; _++ ) 
@@ -61,14 +60,16 @@ spyke::transaction_management_gpu::Transaction_Management_Gpu_Data::Transaction_
 
 }
 
-bool spyke::transaction_management_gpu::Transaction_Management_Gpu_Data::setup_global_cl_memory( size_t* global_work_items_transaction_proccess_size, void* balance_pool_ptr ) {
+bool spyke::transaction_management_gpu::Transaction_Management_Gpu_Data::setup_global_cl_memory( size_t* global_work_items_transaction_proccess_size, void* balance_pool_ptr, char* balance_pool_locker_ptr ) {
 
   size_t balance_pool_size = BALANCE_POOL_SIZE;
+  size_t balance_pool_locker_size = 1;
 
   for ( int _ = 0; _ < platform_count; _ ++ ) {
 
     if( 
-      ! gpu_management::opencl_wrapper::set_buffer( balance_pool[ _ ], contexts[ _ ], CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, balance_pool_size, balance_pool_ptr )
+      ! gpu_management::opencl_wrapper::set_buffer( balance_pool[ _ ], contexts[ _ ], CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, balance_pool_size, balance_pool_ptr ) ||
+      ! gpu_management::opencl_wrapper::set_buffer( balance_pool_locker[ _ ], contexts[ _ ], CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, balance_pool_locker_size, balance_pool_locker_ptr )
     ) return 0;
 
   }
@@ -104,6 +105,9 @@ bool spyke::transaction_management_gpu::Transaction_Management_Gpu_Data::setup_t
 
   TRANSACTION_MANAGEMENT_KERNELS_NAME;
   
+  unsigned int kernel_arg0_index = 0, kernel_arg1_index = 1;
+  unsigned long kernel_arg0_size = 8, kernel_arg1_size = 8;
+
   // Loop throught out all available platforms
   for ( int _ = 0; _ < platform_count; _ ++ ) {
 
@@ -125,9 +129,19 @@ bool spyke::transaction_management_gpu::Transaction_Management_Gpu_Data::setup_t
 
         
         kernels[ _ ][ TRANSACTION_MANAGEMENT_KERNELS_INDEX_TRANSACTION_PROCCESSING ].kernel,
-        k,
-        k1,
+        kernel_arg0_index,
+        kernel_arg0_size,
         balance_pool + _ 
+
+      ) ||
+
+      ! spyke::gpu_management::opencl_wrapper::set_kernel_argument(
+
+        
+        kernels[ _ ][ TRANSACTION_MANAGEMENT_KERNELS_INDEX_TRANSACTION_PROCCESSING ].kernel,
+        kernel_arg1_index,
+        kernel_arg1_size,
+        balance_pool_locker + _ 
 
       )
     ) return 0;
@@ -275,7 +289,7 @@ bool spyke::transaction_management_gpu::Transaction_Management_Gpu_Data::setup( 
 
   }
 
-  if ( ! setup_global_cl_memory( configuration.global_work_items_transaction_proccess, configuration.balance_pool_ptr ) ) return 0;
+  if ( ! setup_global_cl_memory( configuration.global_work_items_transaction_proccess, configuration.balance_pool_ptr, &configuration.balance_pool_locker ) ) return 0;
 
   if ( ! setup_kernels() ) return 0;
 

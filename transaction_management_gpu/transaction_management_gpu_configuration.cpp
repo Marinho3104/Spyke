@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <sys/mman.h>
 #include "./transaction_management_defines.h"
+#include <string.h>
 
 spyke::transaction_management_gpu::Transaction_Management_Gpu_Configuration::~Transaction_Management_Gpu_Configuration() {}
 
@@ -19,5 +20,9 @@ spyke::transaction_management_gpu::Transaction_Management_Gpu_Configuration::Tra
   : gpu_information( gpu_information ), deep_config_set( 0 ), global_work_items_transaction_proccess( ( size_t* ) malloc( sizeof( size_t ) * gpu_information.platforms_count ) ) {
 
     balance_pool_ptr = mmap(NULL, BALANCE_POOL_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+
+    memset( balance_pool_ptr, 0, 8 );
+
+    balance_pool_locker = 0;
 
 }
