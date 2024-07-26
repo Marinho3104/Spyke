@@ -1,64 +1,69 @@
 
-struct Node {
+#include "./../transaction_management_gpu/cl_programs/BST.cl"
 
+// Holds all Transaction data decomposed
+struct Transaction {
+
+  unsigned char from[ 32 ], to[ 32 ];   
   unsigned long long balance, nonce;
-  unsigned char address[ 28 ];
-
-  struct Node* left, *right;
 
 };
 
-char compare_addresses( unsigned char address1[ 28 ], unsigned char address2[ 28 ] ) {
+// Forward
+struct Transaction decompose_transaction_data( __global void*, unsigned int );
+bool check_addresses_integrity( unsigned char[ 32 ], unsigned char[ 32 ] );
+bool check_balance_nonce();
+void check_signature();
 
-  for( int _ = 0; _ < sizeof( address1 ); _ ++ ) 
 
-    if ( address1[ _ ] > address2[ _ ] ) return -1;
+kernel void transaction_processing(
+    // Balance pool related variables
+    __global void* balance_pool, __global char* balance_pool_locker,
+    // Transaction data to confirmed
+    __global void* transaction_data, unsigned int transaction_data_size
+  ) {
 
-    else if( address1[ _ ] < address2[ _ ] ) return 1;
+    // Decompose the given transaction data
+    struct Transaction transaction_decomposed = decompose_transaction_data( transaction_data, transaction_data_size );
 
-  return 0;
+    // Local variables used to verify if all checks were succefull
+    __local bool check0, check1;
 
-}
-
-struct Node* get_node( struct Node* current, unsigned char address[ 28 ] ) {
-
-  while( current && current->balance ) {
-
-    switch( compare_addresses( address, current->address ) ) {
-
-      case -1: current = current->right; break;
-      case 0: return current; break;
-      case 1: current = current->left; break;
-
-    }
-
-  }
-
-  return 0;
-
-}
-
-void add_node( struct Node* current, struct Node* new ) {
-
-  while( current && current->balance ) {
-
-    switch( compare_addresses( new->address, current->address ) ) {
-
-      case -1: 
-
-          if ( current->right ) { current = current->right; break; }
-
-          
-
-          break;
-
-      case 0: return; break;
-      case 1: current = current->left; break;
+    switch( get_local_id( 0 ) ) {
+  
+      case 0: check0 = check_addresses_integrity( transaction_decompose.from, transaction_decompose.to ); break;
+      case 1: check1 = check_balance_nonce(); break;
+      case 2: check_signature(); break;
 
     }
 
-  }
+    for( int _ = 0; _ < 32; _ ++ ) printf("%d", ( int ) transaction_decomposed.from[ _ ]);
+    for( int _ = 0; _ < 32; _ ++ ) printf("%d", ( int ) transaction_decomposed.to[ _ ]);
 
 }
 
-void remove_node() {}
+// Decompose a given transaction data into a struct with
+// all the elements
+struct Transaction decompose_transaction_data( __global void* transaction_data, unsigned int transaction_data_size ) {
+
+  struct Transaction transaction_decomposed;
+  
+  for( int _ = 0; _ < 32; _ ++ ) transaction_decomposed.from[ _ ] = *( ( __global unsigned char* ) transaction_data ++ );
+  for( int _ = 0; _ < 32; _ ++ ) transaction_decomposed.to[ _ ] = *( ( __global unsigned char* ) transaction_data ++ );
+
+  // transaction_decomposed.balance = *( ( __global unsigned long long* ) transaction_data ++ );
+  // transaction_decomposed.nonce = *( ( __global unsigned long long* ) transaction_data ++ );
+
+  return transaction_decomposed;
+
+}
+
+// Checks if the address to and from have correctly formed
+bool check_addresses_integrity( unsigned char address1[ 32 ], unsigned char address2[ 32 ] ) { return 0; }
+
+// Checks if the address from has enough balance and the nonce
+// of the signature is correct
+bool check_balance_nonce() {}
+
+// Checks if the signature is correct given the type of address
+void check_signature() {}

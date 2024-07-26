@@ -64,8 +64,8 @@ bool spyke::transaction_management_gpu::Transaction_Management_Gpu::set_deep_con
 
     }
 
-    // Set the number of work itens to use, which will be 80% percent of the max calculated prior
-    configuration.global_work_items_transaction_proccess[ _ ] = work_items * 4 / 5;
+    // Set the number of work items to use, which will be 80% percent of the max calculated prior
+    configuration.global_work_items_transaction_process[ _ ] = work_items * 4 / 5;
 
   }
 
@@ -92,7 +92,7 @@ bool spyke::transaction_management_gpu::Transaction_Management_Gpu::confirmed_tr
 
   size_t sizes[] = { 3 };
 
-  // Loop throught out each platform to try and start the threads
+  // Loop thoughtout each platform to try and start the threads
   for( int _ = 0; _ < configuration.gpu_information.platforms_count; _++ ) {
   
     cl_mem transaction_data_cl_mem;
@@ -115,7 +115,7 @@ bool spyke::transaction_management_gpu::Transaction_Management_Gpu::confirmed_tr
 
       ! spyke::gpu_management::opencl_wrapper::set_kernel_argument(
 
-        gpu_data.kernels[ _ ][ TRANSACTION_MANAGEMENT_KERNELS_INDEX_TRANSACTION_PROCCESSING ].kernel,
+        gpu_data.kernels[ _ ][ TRANSACTION_MANAGEMENT_KERNELS_INDEX_TRANSACTION_PROCESSING ].kernel,
         2,
         sizeof( void* ),
         &transaction_data_cl_mem
@@ -124,7 +124,7 @@ bool spyke::transaction_management_gpu::Transaction_Management_Gpu::confirmed_tr
 
       ! spyke::gpu_management::opencl_wrapper::set_kernel_argument(
 
-        gpu_data.kernels[ _ ][ TRANSACTION_MANAGEMENT_KERNELS_INDEX_TRANSACTION_PROCCESSING ].kernel,
+        gpu_data.kernels[ _ ][ TRANSACTION_MANAGEMENT_KERNELS_INDEX_TRANSACTION_PROCESSING ].kernel,
         3,
         sizeof( transaction_data_size ),
         &transaction_data_size
@@ -133,12 +133,12 @@ bool spyke::transaction_management_gpu::Transaction_Management_Gpu::confirmed_tr
 
     ) return 0;
  
-    // Transaction Proccessing kernel
+    // Transaction Processing kernel
     if (
      ! spyke::gpu_management::opencl_wrapper::launch_kernel(
 
         gpu_data.main_command_queues[ _ ],
-        gpu_data.kernels[ _ ][ TRANSACTION_MANAGEMENT_KERNELS_INDEX_TRANSACTION_PROCCESSING ].kernel,
+        gpu_data.kernels[ _ ][ TRANSACTION_MANAGEMENT_KERNELS_INDEX_TRANSACTION_PROCESSING ].kernel,
         1,
         0,
         sizes,
@@ -164,15 +164,15 @@ bool start() {
 
   size_t sizes[] = { 2 };
 
-  // Loop throught out each platform to start the kernels
+  // Loop thoughtout each platform to start the kernels
   for( int _ = 0; _ < configuration.gpu_information.platforms_count; _++ ) {
 
-    // Transaction Proccessing kernel
+    // Transaction Processing kernel
     if (
      ! spyke::gpu_management::opencl_wrapper::launch_kernel(
 
         gpu_data.main_command_queues[ _ ],
-        gpu_data.kernels[ _ ][ TRANSACTION_MANAGEMENT_KERNELS_INDEX_TRANSACTION_PROCCESSING ].kernel,
+        gpu_data.kernels[ _ ][ TRANSACTION_MANAGEMENT_KERNELS_INDEX_TRANSACTION_PROCESSING ].kernel,
         1,
         0,
         sizes,

@@ -27,7 +27,7 @@ namespace spyke::transaction_management_gpu {
     // Main command queue to be used
     cl_command_queue* main_command_queues;
  
-    // Acquire command queue to be used for try acquire new thread for new Transaction proccessing
+    // Acquire command queue to be used for try acquire new thread for new Transaction processing
     cl_command_queue* acquire_command_queues;
        
     // Opencl program codes of each part
@@ -67,8 +67,8 @@ namespace spyke::transaction_management_gpu {
     // Setup all cl programs code
     bool setup_cl_program_code();
 
-    // Setup transaction_proccessing kernel
-    bool setup_transaction_proccessing_kernel();
+    // Setup transaction_processing kernel
+    bool setup_transaction_processing_kernel();
 
     // Setup acquire_thread kernel
     bool setup_acquire_thread_kernel();

@@ -24,8 +24,8 @@ namespace spyke::transaction_management_gpu {
     // Sinalize if the user have already set the deep configuration
     bool deep_config_set;
   
-     // Number of global work items used in the execution of the Transaction Proccess kernel
-    size_t* global_work_items_transaction_proccess;  
+     // Number of global work items used in the execution of the Transaction Process kernel
+    size_t* global_work_items_transaction_process;  
 
     // Address of the mmap function pointer for the Balance pool
     void* balance_pool_ptr;

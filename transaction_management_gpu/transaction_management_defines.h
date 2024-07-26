@@ -4,7 +4,7 @@
 #define TRANSACTION_MANAGEMENT_CL_PROGRAMS_FILE_PATH \
   const char* transaction_management_cl_programs_file_path[] = \
     { \
-      "./../transaction_management_gpu/cl_programs/transaction_proccessing.cl", \
+      "./../transaction_management_gpu/cl_programs/transaction_processing.cl", \
       "./../transaction_management_gpu/cl_programs/acquire_thread.cl" \
     };
 
@@ -13,11 +13,11 @@
 #define TRANSACTION_MANAGEMENT_KERNELS_NAME \
   const char* transaction_management_kernels_name[] = \
     { \
-      "transaction_proccessing", \
+      "transaction_processing", \
       "acquire_thread" \
     };
 
-#define TRANSACTION_MANAGEMENT_KERNELS_INDEX_TRANSACTION_PROCCESSING 0
+#define TRANSACTION_MANAGEMENT_KERNELS_INDEX_TRANSACTION_PROCESSING 0
 #define TRANSACTION_MANAGEMENT_KERNELS_INDEX_ACQUIRE_THREAD 1
 
 

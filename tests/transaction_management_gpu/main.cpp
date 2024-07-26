@@ -22,8 +22,16 @@ int main (int argc, char *argv[]) {
 
   if( ! transaction_management_gpu.setup() ) return 1;
 
-  unsigned char transaction_data[ 7 ] = { 101, 2, 3, 4, 5, 6, 7 };
-  unsigned int transaction_data_size = 7;
+  unsigned char transaction_data[ 72 ] = { 0 };
+  unsigned int transaction_data_size = 72;
+
+  unsigned char* cpy = transaction_data;
+
+  for( int _ = 0; _ < 64; _ ++ ) *( cpy ++ ) = _;
+
+  unsigned long long* cpy2 = ( unsigned long long* ) cpy;
+
+  *( cpy2 ++ ) = 999;
 
   transaction_management_gpu.confirmed_transaction( transaction_data, transaction_data_size );
 

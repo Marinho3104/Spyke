@@ -51,7 +51,7 @@ char compare_addresses( unsigned char address1[ 28 ], unsigned char address2[ 28
 // Given an specific address returns the node which holds that value
 struct Node* get_node( struct Node* current, unsigned char address[ 28 ] ) {
 
-  // Beacuse the memory needed for the AVL is already all "allocated" the root node
+  // Because the memory needed for the AVL is already all "allocated" the root node
   // already exists, which make the base case condition to be if the balance is 0,
   // instead of current == 0
   if( ! current ) return 0;

@@ -1,17 +1,22 @@
 struct Node {
 
-  unsigned long long balance, nonce;
-  unsigned char address[ 28 ];
+  unsigned long long balance;
+  unsigned char previous_hash[ 32 ], address[ 32 ];
+  unsigned int in_use;
 
-  struct Node* left, *right, *previous;
+  __local struct Node* left, *right, *previous;
 
 };
 
 
-void copy_node_data( struct Node* dst, struct Node* src, char cpy_AVL_data ) {
+void copy_node_data( __local struct Node* dst, __local struct Node* src, char cpy_AVL_data ) {
 
   dst->balance = src->balance;
-  dst->nonce = src->nonce;
+  dst->in_use = src->in_use;
+
+  for( int _ = 0; _ < sizeof( dst->previous_hash ); _ ++ ) 
+
+    dst->previous_hash[ _ ] = src->previous_hash[ _ ];
 
   for( int _ = 0; _ < sizeof( dst->address ); _ ++ ) 
 
@@ -32,9 +37,9 @@ void copy_node_data( struct Node* dst, struct Node* src, char cpy_AVL_data ) {
 //  -1 address1 is greater
 //  0 they are equal
 //  1 address2 is greater
-char compare_addresses( unsigned char address1[ 28 ], unsigned char address2[ 28 ] ) {
+char compare_addresses( __local unsigned char address1[ 32 ], __local unsigned char address2[ 32 ] ) {
 
-  for( int _ = 0; _ < sizeof( unsigned char [ 28 ] ); _ ++ ) 
+  for( int _ = 0; _ < sizeof( __local unsigned char [ 32 ] ); _ ++ ) 
 
     if ( address1[ _ ] > address2[ _ ] ) return -1;
 
@@ -45,9 +50,9 @@ char compare_addresses( unsigned char address1[ 28 ], unsigned char address2[ 28
 }
 
 // Given an specific address returns the node which holds that value
-struct Node* get_node( struct Node* current, unsigned char address[ 28 ] ) {
+__local struct Node* get_node( __local struct Node* current, __local unsigned char address[ 32 ] ) {
 
-  // Beacuse the memory needed for the AVL is already all "allocated" the root node
+  // Because the memory needed for the AVL is already all "allocated" the root node
   // already exists, which make the base case condition to be if the balance is 0,
   // instead of current == 0
   if( ! current ) return 0;
@@ -76,14 +81,12 @@ struct Node* get_node( struct Node* current, unsigned char address[ 28 ] ) {
 
 }
 
-// Cuase all memory is already initiated we need a double pointer to 
+// Cause all memory is already initiated we need a double pointer to 
 // change the address of the root
-void start_BST( struct Node** current, struct Node* new ) { *current = new; }
+void start_BST( __local struct Node** current, __local struct Node* new ) { *current = new; }
 
 // Adds a new node into the AVL and rebalances everything
-void add_node( struct Node* current, struct Node* new ) {
-
-  printf("Add\n");
+void add_node( __local struct Node* current, __local struct Node* new ) {
 
   // Loops until it reatches the end of the tree
   while( current )
@@ -117,9 +120,9 @@ void add_node( struct Node* current, struct Node* new ) {
 
 }
 
-void remove_node( struct Node* to_delete ) {
+void remove_node( __local struct Node* to_delete ) {
 
-  struct Node* previous_node = to_delete->previous;
+  __local struct Node* previous_node = to_delete->previous;
 
   // Its a base case, leaf node
   if( ! to_delete->left && ! to_delete->right ) {
@@ -152,7 +155,7 @@ void remove_node( struct Node* to_delete ) {
 
   else {
 
-    struct Node* replacement_node = to_delete->left;
+    __local struct Node* replacement_node = to_delete->left;
 
     while( replacement_node->right ) replacement_node = replacement_node->right;
 
@@ -162,18 +165,19 @@ void remove_node( struct Node* to_delete ) {
 
 }
 
-struct Node* create_new_node( unsigned char address[ 28 ], unsigned long long balance, unsigned long long nonce, struct Node* BST_data ) {
+__local struct Node* create_new_node( __local unsigned char address[ 32 ], unsigned long long balance, __local unsigned char previous_hash[ 32 ], __local struct Node* BST_data ) {
 
   while( BST_data->balance ) BST_data ++;
 
   BST_data->balance = balance;
-  BST_data->nonce = nonce;
+  BST_data->in_use = 0;
 
   BST_data->left = 0;
   BST_data->right = 0;
   BST_data->previous = 0;
 
   for( int _ = 0; _ < sizeof( BST_data->address ); _ ++ ) BST_data->address[ _ ] = address[ _ ];
+  for( int _ = 0; _ < sizeof( BST_data->previous_hash ); _ ++ ) BST_data->previous_hash[ _ ] = previous_hash[ _ ];
 
   return BST_data; 
 

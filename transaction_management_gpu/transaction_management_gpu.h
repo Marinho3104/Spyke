@@ -1,5 +1,5 @@
 
-/** transaction_management_gpu.h - Responsible for making the setup and cpu control over the gpu proccessing in Transaction Management
+/** transaction_management_gpu.h - Responsible for making the setup and cpu control over the gpu processing in Transaction Management
  *
 **/
 
@@ -14,9 +14,9 @@
 namespace spyke::transaction_management_gpu {
 
   /* About gpu the configuration will be:
-   * Kernel for Proccessing a transaction
-   * Kernel to sinalize to the proccessing transactions that a new transaction is there to be proccessed
-   * Kernel to get all proccessed transactions and return them
+   * Kernel for Processing a transaction
+   * Kernel to sinalize to the processing transactions that a new transaction is there to be processed
+   * Kernel to get all processed transactions and return them
   */
 
   struct Transaction_Management_Gpu {
@@ -38,14 +38,14 @@ namespace spyke::transaction_management_gpu {
     // Receives and copy the config for the setup
     Transaction_Management_Gpu( Transaction_Management_Gpu_Configuration& );
 
-    // Makes the deep configuration automaticly
+    // Makes the deep configuration automatically
     bool set_deep_configuration();
 
     // Performs the gpu setup according to the given config
     bool setup();
 
-    // Sets up the Proccessing Transaction Kernel
-    bool setup_proccessing_transaction();
+    // Sets up the Processing Transaction Kernel
+    bool setup_processing_transaction();
 
     // Launches the threads used to confirmed a given transaction
     bool confirmed_transaction( void*, unsigned int );
