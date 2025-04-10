@@ -1,0 +1,41 @@
+
+cmake_minimum_required(VERSION 3.15...3.31)
+
+project(
+  Spyke 
+  VERSION 1.0
+  LANGUAGES CXX
+)
+
+
+set( BUILD_DIR ${CMAKE_SOURCE_DIR}/build )
+set( BUILD_BIN_DIR ${BUILD_DIR}/bin )
+set( BUILD_OBJ_DIR ${BUILD_DIR}/obj )
+set( BUILD_LIB_DIR ${BUILD_DIR}/lib )
+
+set( MAIN_FILE_PATH ${CMAKE_SOURCE_DIR}/src/main.cpp )
+
+set( SUB_DIRECTORIES_COMMUNICATION_PATH ${CMAKE_SOURCE_DIR}/communication/ )
+
+
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_BIN_DIR} )
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BUILD_LIB_DIR} )
+set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${build_LIB_dir} )
+
+enable_testing()
+
+add_subdirectory(
+  ${SUB_DIRECTORIES_COMMUNICATION_PATH}
+)
+
+
+add_executable(
+  ${CMAKE_PROJECT_NAME}
+  ${MAIN_FILE_PATH}
+)
+
+
+target_link_libraries(
+  ${CMAKE_PROJECT_NAME}
+  COMMUNICATION_MODULE
+)
