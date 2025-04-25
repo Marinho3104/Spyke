@@ -15,6 +15,9 @@ set(
   src/server/server.cpp
   src/server/server_socket_helper.cpp
 
+  ## HELPER ##
+  src/helper/socket_helper.cpp
+
 )
 
 set(
@@ -29,6 +32,9 @@ set(
 
   ## SERVER ##
   include/server
+
+  ## HELPER ##
+  include/helper/
 
 )
 

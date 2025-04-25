@@ -7,6 +7,7 @@ project(
   LANGUAGES CXX
 )
 
+set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 set( BUILD_DIR ${CMAKE_SOURCE_DIR}/build )
 set( BUILD_BIN_DIR ${BUILD_DIR}/bin )

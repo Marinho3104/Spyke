@@ -3,10 +3,17 @@
 #include "ip_v4.h"
 #include "ip_v6.h"
 #include "server_socket_helper.h"
+#include "socket_helper.h"
 
 
 template< typename IP_TYPE >
-communication::Server< IP_TYPE >::~Server() {}
+communication::Server< IP_TYPE >::~Server() {
+  
+  if( ! is_up() ) return;
+
+  communication::close_socket( socket );
+
+}
 
 template< typename IP_TYPE >
 communication::Server< IP_TYPE >::Server( const IP_TYPE& ip, const int listen_size ) : ip( std::move( ip ) ), listen_size( std::move( listen_size ) ), socket( -1 ) {}
