@@ -2,6 +2,8 @@
 #ifndef INCLUDE_COMMUNICATION_CONNECTION_CONNECTION_H_
 #define INCLUDE_COMMUNICATION_CONNECTION_CONNECTION_H_
 
+#include "socket_context.h"
+
 namespace communication {
 
   template< typename IP_TYPE >
@@ -13,11 +15,13 @@ namespace communication {
       
     private:
 
-      int socket;
+      Socket_Context socket_context_mut;
 
     public:
   
       Connection( const Connection& ) = delete;
+
+      Connection( const Connection&& ) = delete;
 
       Connection() = delete;
 

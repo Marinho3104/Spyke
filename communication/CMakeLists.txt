@@ -7,13 +7,16 @@ set(
   src/ip/ip_v4.cpp
   src/ip/ip_v6.cpp
 
+  ## SOCKET ##
+  src/socket/socket_context.cpp
+  src/socket/connection_socket_helper.cpp
+  src/socket/server_socket_helper.cpp
+
   ## CONNECTION ##
   src/connection/connection.cpp
-  src/connection/connection_socket_helper.cpp
 
   ## SERVER ##
   src/server/server.cpp
-  src/server/server_socket_helper.cpp
 
   ## HELPER ##
   src/helper/socket_helper.cpp
@@ -27,6 +30,9 @@ set(
   ## IP ##
   include/ip
 
+  ## SOCKET ##
+  include/socket
+
   ## CONNECTION ##
   include/connection
 
@@ -34,7 +40,7 @@ set(
   include/server
 
   ## HELPER ##
-  include/helper/
+  include/helper
 
 )
 

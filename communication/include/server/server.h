@@ -2,6 +2,8 @@
 #ifndef INCLUDE_COMMUNICATION_SERVER_SERVER_H_
 #define INCLUDE_COMMUNICATION_SERVER_SERVER_H_
 
+#include "socket_context.h"
+#include <sys/socket.h>
 namespace communication {
 
   template< typename IP_TYPE >
@@ -14,11 +16,13 @@ namespace communication {
 
     private:
 
-      int socket;
+      Socket_Context socket_context_mut;
 
     public:
 
       Server( const Server& ) = delete;
+
+      Server( const Server&& ) = delete;
 
       Server() = delete;
 
@@ -26,7 +30,7 @@ namespace communication {
 
       ~Server();
 
-      Server( const IP_TYPE&, const int );
+      Server( const IP_TYPE&, const int& );
 
       Server( Server&& );
 
