@@ -31,15 +31,16 @@ namespace communication {
       
       const bool operator!=( const Socket_Context& ) const;
 
+      const int& get_socket() const;
+
       const bool is_socket_context_valid() const;
+
+      template< typename IP_TYPE >
+      IP_TYPE get_ip() const;
 
       void make_context_invalid();
 
       const bool close_socket();
-
-    public:
-
-
 
   };
 

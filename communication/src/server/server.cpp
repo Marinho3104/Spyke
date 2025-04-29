@@ -1,5 +1,6 @@
 
 #include "server.h"
+#include "connection.h"
 #include "ip_v4.h"
 #include "ip_v6.h"
 #include "server_socket_helper.h"
@@ -46,6 +47,18 @@ const bool communication::Server< IP_TYPE >::Server::start() {
 
 }
 
+template< typename IP_TYPE >
+communication::Connection< IP_TYPE > communication::Server< IP_TYPE >::accept_new_connection_request() const {
+
+  Socket_Context accepted_connection_socket_context_mut = ::communication::accept_new_connection_request< IP_TYPE >( this->socket_context_mut.get_socket() );
+  if( ! accepted_connection_socket_context_mut.is_socket_context_valid() ) { return Connection< IP_TYPE >(); }
+
+  Connection< IP_TYPE > accepted_connection = Connection< IP_TYPE >( accepted_connection_socket_context_mut );
+  if( ! accepted_connection.is_connected() ) { return Connection< IP_TYPE >(); }
+
+  return accepted_connection;
+
+}
 
 template class communication::Server< communication::Ip_V4 >;
 template class communication::Server< communication::Ip_V6 >;

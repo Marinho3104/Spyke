@@ -2,6 +2,7 @@
 #ifndef INCLUDE_COMMUNICATION_SERVER_SERVER_H_
 #define INCLUDE_COMMUNICATION_SERVER_SERVER_H_
 
+#include "connection.h"
 #include "socket_context.h"
 #include <sys/socket.h>
 namespace communication {
@@ -41,6 +42,8 @@ namespace communication {
       const bool is_up() const;
 
       const bool start();
+
+      Connection< IP_TYPE > accept_new_connection_request() const;
 
   };
 

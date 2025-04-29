@@ -18,7 +18,20 @@ communication::Connection< IP_TYPE >::~Connection() {
 }
 
 template< typename IP_TYPE >
-communication::Connection< IP_TYPE >::Connection( const IP_TYPE& ip ) : ip( ip ), socket_context_mut() {}
+communication::Connection< IP_TYPE >::Connection(): ip(), socket_context_mut() {}
+
+template< typename IP_TYPE >
+communication::Connection< IP_TYPE >::Connection( const IP_TYPE& ip ): ip( std::move( ip ) ), socket_context_mut() {}
+
+template< typename IP_TYPE >
+communication::Connection< IP_TYPE >::Connection( Socket_Context& socket_context_mut )
+  : ip( std::move( socket_context_mut.get_ip< IP_TYPE >() ) ), socket_context_mut( std::move( socket_context_mut ) ) {
+
+    if( ! this->ip.is_valid() ) {
+      this->socket_context_mut.close_socket();
+    }
+
+}
 
 template< typename IP_TYPE >
 communication::Connection< IP_TYPE >::Connection( Connection&& other ) : ip( std::move( other.ip ) ), socket_context_mut( std::move( other.socket_context_mut ) ) {}

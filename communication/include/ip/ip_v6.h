@@ -10,14 +10,14 @@ namespace communication {
 
     public:
 
-      const std::array< uint32_t, 4 > address;
+      const std::array< uint8_t, 16 > address;
       const uint16_t port;
 
     public:
 
       Ip_V6();
 
-      Ip_V6( const std::array< uint32_t, 4 >&, const uint16_t& );
+      Ip_V6( const std::array< uint8_t, 16 >&, const uint16_t& );
 
       const bool operator==( const Ip_V6& ) const;
 

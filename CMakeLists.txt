@@ -9,6 +9,8 @@ project(
 
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
+set(CMAKE_CXX_FLAGS "-std=c++17")
+
 set( BUILD_DIR ${CMAKE_SOURCE_DIR}/build )
 set( BUILD_BIN_DIR ${BUILD_DIR}/bin )
 set( BUILD_OBJ_DIR ${BUILD_DIR}/obj )

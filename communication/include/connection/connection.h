@@ -23,13 +23,15 @@ namespace communication {
 
       Connection( const Connection&& ) = delete;
 
-      Connection() = delete;
-
     public:
 
       ~Connection();
 
+      Connection();
+
       Connection( const IP_TYPE& );
+
+      Connection( Socket_Context& );
 
       Connection( Connection&& );
 

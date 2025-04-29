@@ -77,6 +77,6 @@ communication::Socket_Context communication::accept_new_connection_request( cons
 
 }
 
-template<> communication::Socket_Context communication::accept_new_connection_request< communication::Ip_V4 >( const int& );
-template<> communication::Socket_Context communication::accept_new_connection_request< communication::Ip_V6 >( const int& );
+template communication::Socket_Context communication::accept_new_connection_request< communication::Ip_V4 >( const int& );
+template communication::Socket_Context communication::accept_new_connection_request< communication::Ip_V6 >( const int& );
 
