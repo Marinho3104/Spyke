@@ -9,7 +9,7 @@
 
 
 template< typename IP_TYPE >
-communication::Server< IP_TYPE >::~Server() {
+communication::Server< IP_TYPE >::~Server( void ) {
   
   if( ! is_up() ) return;
 
@@ -31,10 +31,10 @@ template< typename IP_TYPE >
 const bool communication::Server< IP_TYPE >::Server::operator!=( const Server& other ) const { return ip != other.ip || socket_context_mut != other.socket_context_mut; }
 
 template< typename IP_TYPE >
-const bool communication::Server< IP_TYPE >::Server::is_up() const { return socket_context_mut.is_socket_context_valid(); }
+const bool communication::Server< IP_TYPE >::Server::is_up( void ) const { return socket_context_mut.is_socket_context_valid(); }
 
 template< typename IP_TYPE >
-const bool communication::Server< IP_TYPE >::Server::start() {
+const bool communication::Server< IP_TYPE >::Server::start( void ) {
 
   if( is_up() ) return 0;
 
@@ -48,7 +48,7 @@ const bool communication::Server< IP_TYPE >::Server::start() {
 }
 
 template< typename IP_TYPE >
-communication::Connection< IP_TYPE > communication::Server< IP_TYPE >::accept_new_connection_request() const {
+communication::Connection< IP_TYPE > communication::Server< IP_TYPE >::accept_new_connection_request( void ) const {
 
   Socket_Context accepted_connection_socket_context_mut = ::communication::accept_new_connection_request< IP_TYPE >( this->socket_context_mut.get_socket() );
   if( ! accepted_connection_socket_context_mut.is_socket_context_valid() ) { return Connection< IP_TYPE >(); }

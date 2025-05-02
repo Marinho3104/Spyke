@@ -9,7 +9,7 @@
 
 
 template< typename IP_TYPE >
-communication::Connection< IP_TYPE >::~Connection() {
+communication::Connection< IP_TYPE >::~Connection( void ) {
 
   if( ! is_connected() ) return;
 
@@ -18,7 +18,7 @@ communication::Connection< IP_TYPE >::~Connection() {
 }
 
 template< typename IP_TYPE >
-communication::Connection< IP_TYPE >::Connection(): ip(), socket_context_mut() {}
+communication::Connection< IP_TYPE >::Connection( void ): ip(), socket_context_mut() {}
 
 template< typename IP_TYPE >
 communication::Connection< IP_TYPE >::Connection( const IP_TYPE& ip ): ip( std::move( ip ) ), socket_context_mut() {}
@@ -47,10 +47,10 @@ const bool communication::Connection< IP_TYPE >::operator!=( const Connection& o
 }
 
 template< typename IP_TYPE >
-const bool communication::Connection< IP_TYPE >::is_connected() const { return socket_context_mut.is_socket_context_valid(); }
+const bool communication::Connection< IP_TYPE >::is_connected( void ) const { return socket_context_mut.is_socket_context_valid(); }
 
 template< typename IP_TYPE >
-const bool communication::Connection< IP_TYPE >::connect() {
+const bool communication::Connection< IP_TYPE >::connect( void ) {
   
   if( is_connected() ) return 0;
 

@@ -10,7 +10,7 @@
 #include <unistd.h>
 
 
-communication::Socket_Context::Socket_Context(): socket( -1 ), hint_mut{} {}
+communication::Socket_Context::Socket_Context( void ): socket( -1 ), hint_mut{} {}
 
 communication::Socket_Context::Socket_Context( const int& socket, const sockaddr_storage& hint ): socket( socket ), hint_mut( hint ) {}
 
@@ -26,16 +26,16 @@ const bool communication::Socket_Context::operator!=( const Socket_Context& othe
   return socket == other.socket && ( ::memcmp( &hint_mut, &other.hint_mut, sizeof( sockaddr_storage ) ) == 0 );
 }
 
-const int& communication::Socket_Context::get_socket() const {
+const int& communication::Socket_Context::get_socket( void ) const {
   return socket;
 }
 
-const bool communication::Socket_Context::is_socket_context_valid() const {
+const bool communication::Socket_Context::is_socket_context_valid( void ) const {
   return socket != -1;
 }
 
 template<>
-communication::Ip_V4 communication::Socket_Context::get_ip< communication::Ip_V4 >() const {
+communication::Ip_V4 communication::Socket_Context::get_ip< communication::Ip_V4 >( void ) const {
   if( this->hint_mut.ss_family != AF_INET || ! is_socket_context_valid() ) { return Ip_V4(); }
   const sockaddr_in& hint = reinterpret_cast< const sockaddr_in& >( this->hint_mut );
   const uint16_t port = ntohs( hint.sin_port ); 
@@ -44,7 +44,7 @@ communication::Ip_V4 communication::Socket_Context::get_ip< communication::Ip_V4
 }
 
 template<>
-communication::Ip_V6 communication::Socket_Context::get_ip< communication::Ip_V6 >() const {
+communication::Ip_V6 communication::Socket_Context::get_ip< communication::Ip_V6 >( void ) const {
   if( this->hint_mut.ss_family != AF_INET6 || is_socket_context_valid() ) { return Ip_V6(); }
   const sockaddr_in6& hint = reinterpret_cast< const sockaddr_in6& >( this->hint_mut );
   const uint16_t port = ntohs( hint.sin6_port ); 
@@ -53,12 +53,12 @@ communication::Ip_V6 communication::Socket_Context::get_ip< communication::Ip_V6
   return Ip_V6( address_mut, port );
 }
 
-void communication::Socket_Context::make_context_invalid() {
+void communication::Socket_Context::make_context_invalid( void ) {
   if( ! is_socket_context_valid() ) { return; }
   socket = -1;
 }
 
-const bool communication::Socket_Context::close_socket() {
+const bool communication::Socket_Context::close_socket( void ) {
   if( ! is_socket_context_valid() ) { return 0; }
   const bool rtr = close( socket ) == 0;
   if( rtr ) make_context_invalid();

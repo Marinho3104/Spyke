@@ -15,7 +15,7 @@ namespace communication {
 
     public:
 
-      Ip_V6();
+      Ip_V6( void );
 
       Ip_V6( const std::array< uint8_t, 16 >&, const uint16_t& );
 
@@ -23,7 +23,7 @@ namespace communication {
 
       const bool operator!=( const Ip_V6& ) const;
 
-      const bool is_valid() const;
+      const bool is_valid( void ) const;
 
   };
 

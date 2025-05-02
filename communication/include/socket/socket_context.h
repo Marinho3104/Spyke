@@ -21,7 +21,7 @@ namespace communication {
 
     public:
 
-      Socket_Context();
+      Socket_Context( void );
 
       Socket_Context( const int&, const sockaddr_storage& );
 
@@ -31,16 +31,16 @@ namespace communication {
       
       const bool operator!=( const Socket_Context& ) const;
 
-      const int& get_socket() const;
+      const int& get_socket( void ) const;
 
-      const bool is_socket_context_valid() const;
+      const bool is_socket_context_valid( void ) const;
 
       template< typename IP_TYPE >
-      IP_TYPE get_ip() const;
+      IP_TYPE get_ip( void ) const;
 
-      void make_context_invalid();
+      void make_context_invalid( void );
 
-      const bool close_socket();
+      const bool close_socket( void );
 
   };
 

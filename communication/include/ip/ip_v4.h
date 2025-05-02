@@ -15,7 +15,7 @@ namespace communication {
 
     public:
 
-      Ip_V4();
+      Ip_V4( void );
 
       Ip_V4( const uint32_t&, const uint16_t& );
 
@@ -23,7 +23,7 @@ namespace communication {
 
       const bool operator!=( const Ip_V4& ) const;
 
-      const bool is_valid() const;
+      const bool is_valid( void ) const;
 
   };
 

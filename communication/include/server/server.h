@@ -25,11 +25,11 @@ namespace communication {
 
       Server( const Server&& ) = delete;
 
-      Server() = delete;
+      Server( void ) = delete;
 
     public:
 
-      ~Server();
+      ~Server( void );
 
       Server( const IP_TYPE&, const int& );
 
@@ -39,11 +39,11 @@ namespace communication {
 
       const bool operator!=( const Server& ) const;
 
-      const bool is_up() const;
+      const bool is_up( void ) const;
 
-      const bool start();
+      const bool start( void );
 
-      Connection< IP_TYPE > accept_new_connection_request() const;
+      Connection< IP_TYPE > accept_new_connection_request( void ) const;
 
   };
 

@@ -25,9 +25,9 @@ namespace communication {
 
     public:
 
-      ~Connection();
+      ~Connection( void );
 
-      Connection();
+      Connection( void );
 
       Connection( const IP_TYPE& );
 
@@ -39,9 +39,9 @@ namespace communication {
 
       const bool operator!=( const Connection& ) const;
 
-      const bool is_connected() const;
+      const bool is_connected( void ) const;
 
-      const bool connect();
+      const bool connect( void );
 
   };
 

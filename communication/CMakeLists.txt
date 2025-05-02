@@ -11,15 +11,13 @@ set(
   src/socket/socket_context.cpp
   src/socket/connection_socket_helper.cpp
   src/socket/server_socket_helper.cpp
+  src/socket/socket_helper.cpp
 
   ## CONNECTION ##
   src/connection/connection.cpp
 
   ## SERVER ##
   src/server/server.cpp
-
-  ## HELPER ##
-  src/helper/socket_helper.cpp
 
 )
 
@@ -38,9 +36,6 @@ set(
 
   ## SERVER ##
   include/server
-
-  ## HELPER ##
-  include/helper
 
 )
 
