@@ -3,6 +3,7 @@
 #define INCLUDE_COMMUNICATION_CONNECTION_CONNECTION_H_
 
 #include "socket_context.h"
+#include "packet.h"
 
 namespace communication {
 
@@ -42,6 +43,10 @@ namespace communication {
       const bool is_connected( void ) const;
 
       const bool connect( void );
+
+      bool send( const Packet& );
+
+      Packet receive();
 
   };
 

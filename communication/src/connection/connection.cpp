@@ -52,7 +52,9 @@ const bool communication::Connection< IP_TYPE >::is_connected( void ) const { re
 template< typename IP_TYPE >
 const bool communication::Connection< IP_TYPE >::connect( void ) {
   
-  if( is_connected() ) return 0;
+  if( is_connected() || ! ip.is_valid() ) { 
+    return 0;
+  }
 
   Socket_Context socket_context_mut = communication::connect( ip );
   if( ! socket_context_mut.is_socket_context_valid() ) return 0;
@@ -60,6 +62,34 @@ const bool communication::Connection< IP_TYPE >::connect( void ) {
   this->socket_context_mut.~Socket_Context();
   new( &this->socket_context_mut ) Socket_Context( std::move( socket_context_mut ) );
   return 1;
+
+}
+
+template< typename IP_TYPE >
+bool communication::Connection< IP_TYPE >::send( const Packet& packet ) {
+
+  if( ! is_connected() ) { 
+    return 0; 
+  }
+
+  const std::unique_ptr< uint8_t[] > packet_serialized = packet.serialize();
+  
+  return communication::send( 
+    this->socket_context_mut.get_socket(), 
+    packet_serialized.get(),
+    packet.serialized_length()
+  );
+
+}
+
+template< typename IP_TYPE >
+communication::Packet communication::Connection< IP_TYPE >::receive() {
+
+  if( ! is_connected() ) {
+    return Packet();
+  }
+
+  
 
 }
 

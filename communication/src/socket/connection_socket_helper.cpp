@@ -49,3 +49,29 @@ communication::Socket_Context communication::connect< communication::Ip_V6 >( co
   return Socket_Context( socket, hint_mut );
 
 }
+
+bool communication::send( const int& socket, const uint8_t*& data, const uint32_t& data_length ) {
+  return ::send( socket, data, data_length, NULL ) > 0;  
+}
+
+ssize_t communication::receive( const int& socket, uint8_t* data_mut, const uint32_t& data_length ) {
+  return ::recv( socket, data_mut, data_length, NULL );
+}
+
+bool communication::receive_until( const int& socket, uint8_t* data_mut, const uint32_t& data_length ) {
+
+  uint32_t bytes_read_mut = 0;
+  ssize_t receive_status;
+
+  while( bytes_read_mut < data_length ) {
+
+    receive_status = receive( socket, data_mut + bytes_read_mut, data_length - bytes_read_mut );
+    if( receive_status <= 0 ) {
+      break;
+    }
+
+    bytes_read_mut += receive_status;
+    
+  }
+
+}
