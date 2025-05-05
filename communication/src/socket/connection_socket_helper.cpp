@@ -51,11 +51,11 @@ communication::Socket_Context communication::connect< communication::Ip_V6 >( co
 }
 
 bool communication::send( const int& socket, const uint8_t*& data, const uint32_t& data_length ) {
-  return ::send( socket, data, data_length, NULL ) > 0;  
+  return ::send( socket, data, data_length, 0 ) > 0;  
 }
 
 ssize_t communication::receive( const int& socket, uint8_t* data_mut, const uint32_t& data_length ) {
-  return ::recv( socket, data_mut, data_length, NULL );
+  return ::recv( socket, data_mut, data_length, 0 );
 }
 
 bool communication::receive_until( const int& socket, uint8_t* data_mut, const uint32_t& data_length ) {
@@ -73,5 +73,7 @@ bool communication::receive_until( const int& socket, uint8_t* data_mut, const u
     bytes_read_mut += receive_status;
     
   }
+
+  return data_length == bytes_read_mut;
 
 }

@@ -4,6 +4,7 @@
 #include "ip_v4.h"
 #include "ip_v6.h"
 #include "socket_context.h"
+#include "packet_headers.h"
 #include <algorithm>
 #include <cstdlib>
 
@@ -66,30 +67,55 @@ const bool communication::Connection< IP_TYPE >::connect( void ) {
 }
 
 template< typename IP_TYPE >
-bool communication::Connection< IP_TYPE >::send( const Packet& packet ) {
+bool communication::Connection< IP_TYPE >::send( const Packet& packet ) const {
 
   if( ! is_connected() ) { 
     return 0; 
   }
 
-  const std::unique_ptr< uint8_t[] > packet_serialized = packet.serialize();
+  std::unique_ptr< uint8_t[] > packet_serialized = packet.serialize();
+  const uint8_t* packet_serialized_raw_pointer = packet_serialized.get();
   
-  return communication::send( 
+  return communication::send(
     this->socket_context_mut.get_socket(), 
-    packet_serialized.get(),
+    packet_serialized_raw_pointer,
     packet.serialized_length()
   );
 
 }
 
 template< typename IP_TYPE >
-communication::Packet communication::Connection< IP_TYPE >::receive() {
+communication::Packet communication::Connection< IP_TYPE >::receive() const {
 
   if( ! is_connected() ) {
     return Packet();
   }
 
-  
+  std::array< uint8_t, PACKET_HEADERS_FULL_SIZE > headers_mut;
+  if(
+    communication::receive_until( 
+      socket_context_mut.get_socket(), 
+      headers_mut.data(), 
+      headers_mut.size() 
+    )
+  ) { return Packet(); }
+
+  const Packet_Headers packet_headers = Packet_Headers( headers_mut );
+
+  std::unique_ptr< uint8_t[] > packet_payload_mut = 
+    std::make_unique< uint8_t[] >( packet_headers.get_payload_length() );
+  if(
+    communication::receive_until( 
+      socket_context_mut.get_socket(), 
+      packet_payload_mut.get(), 
+      packet_headers.get_payload_length()
+    )
+  ) { return Packet(); }
+
+  return Packet(
+    packet_headers,
+    std::move( packet_payload_mut )
+  );
 
 }
 

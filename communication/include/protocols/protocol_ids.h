@@ -9,6 +9,7 @@ namespace communication {
     enum PROTOCOL_ID: uint8_t {
 
         INVALID = 0,
+        TEST = 1,
         
     };
 

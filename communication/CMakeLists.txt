@@ -19,6 +19,10 @@ set(
   ## SERVER ##
   src/server/server.cpp
 
+  ## PACKET ##
+  src/packet/packet_headers.cpp
+  src/packet/packet.cpp
+
 )
 
 set(
@@ -36,6 +40,12 @@ set(
 
   ## SERVER ##
   include/server
+
+  ## PACKET ##
+  include/packet
+
+  ## PROTOCOLS ##
+  include/protocols
 
 )
 
@@ -74,3 +84,8 @@ set( COMMUNICATION_MODULE_SERVER_TESTS "communication_module_server_tests" )
 add_executable( ${COMMUNICATION_MODULE_SERVER_TESTS} src/server/server_tests.cpp )
 target_link_libraries( ${COMMUNICATION_MODULE_SERVER_TESTS} COMMUNICATION_MODULE )
 add_test( SERVER_TEST ${BUILD_BIN_DIR}/communication_module_server_tests )
+
+set( COMMUNICATION_MODULE_PACKET_TESTS "communication_module_packet_tests" )
+add_executable( ${COMMUNICATION_MODULE_PACKET_TESTS} src/packet/packet_tests.cpp )
+target_link_libraries( ${COMMUNICATION_MODULE_PACKET_TESTS} COMMUNICATION_MODULE )
+add_test( PACKET_TEST ${BUILD_BIN_DIR}/communication_module_packet_tests )

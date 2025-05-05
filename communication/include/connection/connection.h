@@ -44,9 +44,9 @@ namespace communication {
 
       const bool connect( void );
 
-      bool send( const Packet& );
+      bool send( const Packet& ) const;
 
-      Packet receive();
+      Packet receive() const;
 
   };
 
