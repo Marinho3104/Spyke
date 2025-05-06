@@ -6,6 +6,7 @@
 #include "socket_context.h"
 #include "packet_headers.h"
 #include <algorithm>
+#include <iostream>
 #include <cstdlib>
 
 
@@ -69,7 +70,7 @@ const bool communication::Connection< IP_TYPE >::connect( void ) {
 template< typename IP_TYPE >
 bool communication::Connection< IP_TYPE >::send( const Packet& packet ) const {
 
-  if( ! is_connected() ) { 
+  if( ! is_connected() || ! packet.is_valid() ) { 
     return 0; 
   }
 
@@ -93,7 +94,7 @@ communication::Packet communication::Connection< IP_TYPE >::receive() const {
 
   std::array< uint8_t, PACKET_HEADERS_FULL_SIZE > headers_mut;
   if(
-    communication::receive_until( 
+    ! communication::receive_until( 
       socket_context_mut.get_socket(), 
       headers_mut.data(), 
       headers_mut.size() 
@@ -105,7 +106,7 @@ communication::Packet communication::Connection< IP_TYPE >::receive() const {
   std::unique_ptr< uint8_t[] > packet_payload_mut = 
     std::make_unique< uint8_t[] >( packet_headers.get_payload_length() );
   if(
-    communication::receive_until( 
+    ! communication::receive_until( 
       socket_context_mut.get_socket(), 
       packet_payload_mut.get(), 
       packet_headers.get_payload_length()
