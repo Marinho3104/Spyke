@@ -74,3 +74,8 @@ set( COMMUNICATION_MODULE_PACKET_TESTS "communication_module_packet_tests" )
 add_executable( ${COMMUNICATION_MODULE_PACKET_TESTS} communication/src/packet/packet_tests.cpp )
 target_link_libraries( ${COMMUNICATION_MODULE_PACKET_TESTS} COMMUNICATION_MODULE )
 add_test( PACKET_TEST ${BUILD_BIN_DIR}/communication_module_packet_tests )
+
+set( PROTOCOLS_MODULE_PROTOCOLS_TESTS "protocols_module_protocols_tests" )
+add_executable( ${PROTOCOLS_MODULE_PROTOCOLS_TESTS} protocols/src/protocols_tests.cpp )
+target_link_libraries( ${PROTOCOLS_MODULE_PROTOCOLS_TESTS} PROTOCOLS_MODULE )
+add_test( PROTOCOLS_TEST ${BUILD_BIN_DIR}/protocols_module_protocols_tests )
