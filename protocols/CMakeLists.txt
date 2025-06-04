@@ -23,7 +23,7 @@ set(
   ## DISCONNECT PROTOCOL ##
   ${PROTOCOLS_MODULE_ROOT_DIR}/include/disconnect_protocol
 
-  ../communication/include/packet
+  ${ROOT_DIRECTORY}/communication/include/packet
 
 )
 
