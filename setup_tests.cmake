@@ -36,7 +36,7 @@ if( PROTOCOLS_MODULE_TESTS )
 
   set( PROTOCOLS_MODULE_DISCONNECT_PROTOCOL_TESTS "protocols_module_disconnect_protocol_tests" )
   add_executable( ${PROTOCOLS_MODULE_DISCONNECT_PROTOCOL_TESTS} protocols/src/disconnect_protocol/disconnect_protocol_tests.cpp )
-  target_link_libraries( ${PROTOCOLS_MODULE_DISCONNECT_PROTOCOL_TESTS} PROTOCOLS_MODULE )
+  target_link_libraries( ${PROTOCOLS_MODULE_DISCONNECT_PROTOCOL_TESTS} COMMUNICATION_MODULE PROTOCOLS_MODULE )
   add_test( DISCONNECT_PROTOCOL_TEST ${BUILD_BIN_DIR}/protocols_module_disconnect_protocol_tests )
 
 endif()

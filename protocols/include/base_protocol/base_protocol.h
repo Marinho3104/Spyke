@@ -24,7 +24,7 @@ namespace communication {
 
             Base_Protocol( std::unique_ptr< uint8_t[] >, const uint32_t& );
 
-            bool is_valid() const;
+            virtual bool is_valid() const;
 
             virtual communication::Packet to_packet() const = 0;
 

@@ -3,7 +3,6 @@
 #define INCLUDE_COMMUNICATION_PACKET_PACKET_H_
 
 #include "packet_headers.h"
-#include "protocol_ids.h"
 #include <memory>
 
 #define PACKET_ID_SIZE sizeof( communication::PROTOCOL_ID )

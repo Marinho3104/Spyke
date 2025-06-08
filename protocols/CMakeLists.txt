@@ -13,20 +13,6 @@ set(
   
 )
 
-set(
-
-  PROTOCOLS_MODULE_COMMON_HEADERS_DIRECTORIES
-
-  ## BASE PROTOCOL ##
-  ${PROTOCOLS_MODULE_ROOT_DIR}/include/base_protocol
-
-  ## DISCONNECT PROTOCOL ##
-  ${PROTOCOLS_MODULE_ROOT_DIR}/include/disconnect_protocol
-
-  ${ROOT_DIRECTORY}/communication/include/packet
-
-)
-
 add_library(
 
   PROTOCOLS_MODULE STATIC
@@ -35,10 +21,11 @@ add_library(
 
 )
 
-target_include_directories(
-  
+target_link_libraries(
+
   PROTOCOLS_MODULE PUBLIC
 
-  ${PROTOCOLS_MODULE_COMMON_HEADERS_DIRECTORIES}
+  EXPORT_COMMUNICATION_MODULE_COMMON_HEADERS_DIRECTORIES
+  EXPORT_PROTOCOLS_MODULE_COMMON_HEADERS_DIRECTORIES
 
 )

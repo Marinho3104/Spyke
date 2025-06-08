@@ -13,10 +13,9 @@ namespace communication {
 
             Disconnect_Protocol();
 
-            Disconnect_Protocol( std::unique_ptr< uint8_t[] >, const uint32_t& );
+            bool is_valid() const override;
 
-            template< typename NODE_TYPE >
-            void handle() const;
+            communication::Packet to_packet() const override;
 
     };
 

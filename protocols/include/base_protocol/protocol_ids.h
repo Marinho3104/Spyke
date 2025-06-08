@@ -10,6 +10,7 @@ namespace communication {
 
         INVALID = 0,
         TEST = 1,
+        DISCONNECT = 2,
         
     };
 

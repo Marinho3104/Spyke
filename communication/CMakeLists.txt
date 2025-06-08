@@ -27,32 +27,6 @@ set(
 
 )
 
-set(
-
-  COMMUNICATION_MODULE_COMMON_HEADERS_DIRECTORIES
-
-  ## IP ##
-  ${COMMUNICATION_MODULE_ROOT_DIR}/include/ip
-
-  ## SOCKET ##
-  ${COMMUNICATION_MODULE_ROOT_DIR}/include/socket
-
-  ## CONNECTION ##
-  ${COMMUNICATION_MODULE_ROOT_DIR}/include/connection
-
-  ## SERVER ##
-  ${COMMUNICATION_MODULE_ROOT_DIR}/include/server
-
-  ## PACKET ##
-  ${COMMUNICATION_MODULE_ROOT_DIR}/include/packet
-
-  ## PROTOCOLS ##
-  ${COMMUNICATION_MODULE_ROOT_DIR}/include/protocols
-
-  ../protocols/include/base_protocol
-
-)
-
 add_library(
 
   COMMUNICATION_MODULE STATIC
@@ -61,10 +35,11 @@ add_library(
 
 )
 
-target_include_directories(
+target_link_libraries(
   
   COMMUNICATION_MODULE PUBLIC
 
-  ${COMMUNICATION_MODULE_COMMON_HEADERS_DIRECTORIES}
+  EXPORT_COMMUNICATION_MODULE_COMMON_HEADERS_DIRECTORIES
+  EXPORT_PROTOCOLS_MODULE_COMMON_HEADERS_DIRECTORIES
 
 )
