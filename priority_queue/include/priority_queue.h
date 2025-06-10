@@ -2,7 +2,9 @@
 #ifndef INCLUDE_PRIORITY_QUEUE_H_
 #define INCLUDE_PRIORITY_QUEUE_H_
 
+#include "priority_slot.h"
 #include <cstdint>
+#include <memory>
 #include <semaphore.h>
 
 
@@ -12,8 +14,13 @@ namespace priority_queue {
 
     private:
 
+      std::unique_ptr< Priority_Slot[] > slots_mut;
       sem_t is_not_empty_mut;
       sem_t locker_mut;
+
+    private:
+
+      const uint8_t slots_count;
 
     public:
 
@@ -21,7 +28,7 @@ namespace priority_queue {
 
     public:
 
-      Priority_Queue( const uint16_t& );
+      Priority_Queue( const uint8_t& );
 
   };
 
