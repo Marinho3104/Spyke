@@ -1,29 +1,62 @@
 
+#ifndef INCLUDE_UTILS_SMART_POINTERS_H_
+#define INCLUDE_UTILS_SMART_POINTERS_H_
+
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
+#include <utility>
 
 
 namespace utils {
 
+  template< typename T >
+  struct Unique_Array_Deleter {
+
+    private:
+
+      uint16_t array_size_mut;
+
+    public:
+
+      Unique_Array_Deleter() : array_size_mut( 0 ) {}
+
+      Unique_Array_Deleter( const uint16_t& array_size ) : array_size_mut( array_size ) {}
+
+      Unique_Array_Deleter( Unique_Array_Deleter&& other ) = default;
+
+      Unique_Array_Deleter& operator=( Unique_Array_Deleter&& other ) = default;
+
+      void operator()( T* ptr_mut ) {
+      
+        for( uint16_t _ = 0; _ < array_size_mut; _++ ) {
+          ptr_mut[ _ ].~T();
+        }
+
+        ::operator delete[]( ptr_mut );
+
+      }
+
+  };
 
   template< typename T, typename... CONSTRUCTOR_ARGS >
-  std::unique_ptr< T > create_unique_ptr_array_with_arguments( const uint16_t& array_size, const CONSTRUCTOR_ARGS&... constructor_args ) {
+  std::unique_ptr< T[], Unique_Array_Deleter< T > > make_unique_array_with_args( const uint16_t& array_size, CONSTRUCTOR_ARGS&&... constructor_args ) {
 
-    const auto unique_ptr_delete = []( T* t ) {
-      delete t;
-    };
-
-    void* ptr_raw_mut = malloc( sizeof( T ) * array_size );
+    void* ptr_raw_mut = ::operator new[]( sizeof( T ) * array_size );
     T* ptr_mut = static_cast< T* >( ptr_raw_mut );
 
     for( int _ = 0; _ < array_size; _++ ) {
-      new( &ptr_mut[ _ ] ) T( constructor_args... );
+      new( &ptr_mut[ _ ] ) T( std::forward< CONSTRUCTOR_ARGS >( constructor_args )... );
     }
 
-
-    return std::unique_ptr< T[], decltype( unique_ptr_delete ) >( ptr_mut,unique_ptr_delete );
+    Unique_Array_Deleter< T > deleter = Unique_Array_Deleter< T >( array_size );
+    return std::unique_ptr< T[], Unique_Array_Deleter< T > >( ptr_mut, std::move( deleter ) );
 
   }
 
+  template< typename T >
+  using unique_array_with_args_return_type = std::unique_ptr< T[], Unique_Array_Deleter< T > >;
+
 }
+
+#endif

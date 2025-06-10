@@ -3,18 +3,19 @@
 #define INCLUDE_PRIORITY_QUEUE_H_
 
 #include "priority_slot.h"
+#include "smart_pointers.hpp"
 #include <cstdint>
-#include <memory>
 #include <semaphore.h>
 
 
 namespace priority_queue {
 
+
   class Priority_Queue {
 
     private:
 
-      std::unique_ptr< Priority_Slot[] > slots_mut;
+      utils::unique_array_with_args_return_type< Priority_Slot > slots_mut;
       sem_t is_not_empty_mut;
       sem_t locker_mut;
 

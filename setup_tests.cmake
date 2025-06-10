@@ -40,3 +40,18 @@ if( PROTOCOLS_MODULE_TESTS )
   add_test( DISCONNECT_PROTOCOL_TEST ${BUILD_BIN_DIR}/protocols_module_disconnect_protocol_tests )
 
 endif()
+
+
+if( PRIORITY_QUEUE_MODULE_TESTS )
+
+endif()
+
+
+if( UTILS_MODULE_TESTS )
+
+  set( UTILS_MODULE_SMART_POINTERS_TESTS "utils_module_smart_pointers_tests" )
+  add_executable( ${UTILS_MODULE_SMART_POINTERS_TESTS} utils/src/smart_pointers/smart_pointers_tests.cpp )
+  target_link_libraries( ${UTILS_MODULE_SMART_POINTERS_TESTS} EXPORT_UTILS_MODULE_COMMON_HEADERS_DIRECTORIES )
+  add_test( SMART_POINTERS_TESTS ${BUILD_BIN_DIR}/utils_module_smart_pointers_tests )
+
+endif()
