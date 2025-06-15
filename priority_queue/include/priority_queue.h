@@ -16,8 +16,7 @@ namespace priority_queue {
     private:
 
       utils::unique_array_with_args_return_type< Priority_Slot > slots_mut;
-      sem_t is_not_empty_mut;
-      sem_t locker_mut;
+      std::unique_ptr< sem_t > is_not_empty_mut, locker_mut;
 
     private:
 
@@ -27,9 +26,15 @@ namespace priority_queue {
 
       Priority_Queue() = delete;
 
+      Priority_Queue( const Priority_Queue& ) = delete;
+
     public:
 
       Priority_Queue( const uint8_t& );
+
+      Priority_Queue( Priority_Queue&& );
+
+      bool is_valid() const;
 
   };
 

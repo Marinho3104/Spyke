@@ -23,7 +23,7 @@ namespace utils {
 
       Unique_Array_Deleter( const uint16_t& array_size ) : array_size_mut( array_size ) {}
 
-      Unique_Array_Deleter( Unique_Array_Deleter&& other ) = default;
+      Unique_Array_Deleter( const Unique_Array_Deleter& ) = default;
 
       Unique_Array_Deleter& operator=( Unique_Array_Deleter&& other ) = default;
 
@@ -49,8 +49,7 @@ namespace utils {
       new( &ptr_mut[ _ ] ) T( std::forward< CONSTRUCTOR_ARGS >( constructor_args )... );
     }
 
-    Unique_Array_Deleter< T > deleter = Unique_Array_Deleter< T >( array_size );
-    return std::unique_ptr< T[], Unique_Array_Deleter< T > >( ptr_mut, std::move( deleter ) );
+    return std::unique_ptr< T[], Unique_Array_Deleter< T > >( ptr_mut, Unique_Array_Deleter< T >( array_size ) );
 
   }
 
