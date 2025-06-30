@@ -63,6 +63,10 @@ add_subdirectory(
   ${SUB_DIRECTORIES_UTILS_PATH}
 )
 
+add_subdirectory(
+  ${SUB_DIRECTORIES_DIAGNOSTICS_PATH}
+)
+
 add_executable(
   ${CMAKE_PROJECT_NAME}
   ${MAIN_FILE_PATH}
@@ -74,6 +78,7 @@ target_link_libraries(
   COMMUNICATION_MODULE
   PROTOCOLS_MODULE
   PRIORITY_QUEUE_MODULE
+  DIAGNOSTICS_MODULE
   # UTILS_MODULE
 )
 

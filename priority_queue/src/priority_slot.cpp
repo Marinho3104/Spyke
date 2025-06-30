@@ -45,14 +45,15 @@ bool priority_queue::Priority_Slot::add_item( std::unique_ptr< Item >&& item ) {
   sem_wait( &locker_mut );
 
   Item* new_last_mut_value_mut = item.get();
-  const bool set_next_sts = last_mut->set_next( std::move( item ) );
-  if( set_next_sts ) {
-    last_mut = new_last_mut_value_mut;
-  }
+  // const bool set_next_sts = last_mut->set_next( std::move( item ) );
+  // if( set_next_sts ) {
+  //   last_mut = new_last_mut_value_mut;
+  // }
 
   sem_post( &locker_mut );
 
-  return set_next_sts;
+  // return set_next_sts;
+  return 0;
 
 }
 

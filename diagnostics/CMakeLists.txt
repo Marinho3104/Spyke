@@ -1,27 +1,27 @@
 
 set( DIAGNOSTICS_MODULE_ROOT_DIR ${CMAKE_SOURCE_DIR}/diagnostics )
 
-# set(
-#
-#   UTILS_MODULE_COMMON_SOURCES
-#
-#   ## SMART POINTERS ##
-#   # ${UTILS_MODULE_ROOT_DIR}/src/smart_pointers/smart_pointers.cpp
-#
-# )
-#
-# add_library(
-#
-#   UTILS_MODULE STATIC
-#
-#   ${UTILS_MODULE_COMMON_SOURCES}
-#
-# )
-#
-# target_link_libraries(
-#
-#   UTILS_MODULE PUBLIC
-#
-#   EXPORT_UTILS_MODULE_COMMON_HEADERS_DIRECTORIES
-#
-# )
+set(
+
+  DIAGNOSTICS_MODULE_COMMON_SOURCES
+
+  ## LOG ##
+  ${DIAGNOSTICS_MODULE_ROOT_DIR}/src/log/log.cpp
+
+)
+
+add_library(
+
+  DIAGNOSTICS_MODULE STATIC
+
+  ${DIAGNOSTICS_MODULE_COMMON_SOURCES}
+
+)
+
+target_link_libraries(
+
+  DIAGNOSTICS_MODULE PUBLIC
+
+  EXPORT_DIAGNOSTICS_MODULE_COMMON_HEADERS_DIRECTORIES
+
+)

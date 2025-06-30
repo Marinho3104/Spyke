@@ -55,3 +55,14 @@ if( UTILS_MODULE_TESTS )
   add_test( SMART_POINTERS_TESTS ${BUILD_BIN_DIR}/utils_module_smart_pointers_tests )
 
 endif()
+
+if( DIAGNOSTICS_MODULE_TESTS )
+
+  set( DIAGNOSTICS_MODULE_LOG_TESTS "diagnostics_module_log_tests" )
+  add_executable( ${DIAGNOSTICS_MODULE_LOG_TESTS} diagnostics/src/log/log_tests.cpp )
+  target_link_libraries( ${DIAGNOSTICS_MODULE_LOG_TESTS} DIAGNOSTICS_MODULE )
+  add_test( LOG_TESTS ${BUILD_BIN_DIR}/diagnostics_module_log_tests )
+
+endif()
+
+
