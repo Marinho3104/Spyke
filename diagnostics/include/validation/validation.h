@@ -2,6 +2,8 @@
 #ifndef INCLUDE_DIAGNOSTICS_VALIDATION_H_
 #define INCLUDE_DIAGNOSTICS_VALIDATION_H_
 
+#include "log.h"
+
 // If the condition fails it will stop the execution of the program
 #define ENSURE( condition ) \
   if( ! condition ) { \
