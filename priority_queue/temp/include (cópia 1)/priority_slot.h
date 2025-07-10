@@ -43,11 +43,13 @@ namespace priority_queue {
 
     public:
 
+      Priority_Slot() noexcept;
+
       Priority_Slot( const uint32_t& ) noexcept;
 
       bool is_valid() const noexcept;
 
-      bool add_item( std::unique_ptr< Item >&& ) noexcept;
+      void add_item( std::unique_ptr< Item >&& ) noexcept;
 
       std::unique_ptr< Item > pop() noexcept;
 

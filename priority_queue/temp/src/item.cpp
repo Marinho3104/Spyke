@@ -1,9 +1,12 @@
 
 #include "item.h"
-#include <cstdint>
 
+
+priority_queue::Item::Item() noexcept : data_mut(), data_size( 0 ) {}
 
 priority_queue::Item::Item( std::unique_ptr< uint8_t[] >&& data_mut, const uint32_t& data_size ) noexcept : data_mut( std::move( data_mut ) ), data_size( data_size ) {}
+
+priority_queue::Item::Item( Item&& other ) noexcept : data_mut( std::move( other.data_mut ) ), data_size( other.data_size ) {}
 
 bool priority_queue::Item::is_valid() const noexcept { return !! data_mut; }
 
@@ -11,10 +14,6 @@ std::unique_ptr< priority_queue::Item >& priority_queue::Item::get_next() noexce
   return next_mut;
 }
 
-const std::unique_ptr< uint8_t[] >& priority_queue::Item::get_data() const noexcept {
-  return data_mut;
-}
-
-const uint32_t& priority_queue::Item::get_data_size() const noexcept {
-  return data_size;
+void priority_queue::Item::set_next( std::unique_ptr< Item >&& next_value ) noexcept {
+  next_mut = std::move( next_value );
 }

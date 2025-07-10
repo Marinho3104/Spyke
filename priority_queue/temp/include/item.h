@@ -31,9 +31,8 @@ namespace priority_queue {
 
       std::unique_ptr< Item >& get_next() noexcept;
 
-      const std::unique_ptr< uint8_t[] >& get_data() const noexcept;
+      void set_next( std::unique_ptr< Item >&& ) noexcept;
 
-      const uint32_t& get_data_size() const noexcept;
 
   };
 

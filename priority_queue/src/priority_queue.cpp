@@ -1,45 +1,79 @@
 
 #include "priority_queue.h"
+#include "item.h"
 #include "priority_slot.h"
 #include "smart_pointers.hpp"
 #include <cstdint>
 #include <memory>
+#include <mutex>
 #include <semaphore.h>
 
 
-priority_queue::Priority_Queue::Priority_Queue( const uint8_t& slots_count ) : slots_count( slots_count ) {
+priority_queue::Priority_Queue::Priority_Queue( const uint8_t& slots_count, const uint32_t& max_items_per_slot ) noexcept : slots_count( slots_count ), items_count_mut( 0 ) {
 
-  // TODO: Handle throws of make_unique
-  locker_mut = std::make_unique< sem_t >();
-  const int locker_mut_sts = sem_init( locker_mut.get(), 0, 1 );
+  const int locker_mut_sts = sem_init( &locker_mut, 0, 1 );
   if( locker_mut_sts != 0 ) {
     return;
   }
 
-  is_not_empty_mut = std::make_unique< sem_t >();
-  const int is_not_empty_mut_sts = sem_init( is_not_empty_mut.get(), 0, 0 );
-  if( is_not_empty_mut_sts != 0 ) {
-    return;
-  }
-
-  slots_mut = utils::make_unique_array_with_args< Priority_Slot >( slots_count, *is_not_empty_mut );
+  slots_mut = utils::make_unique_array_with_args< Priority_Slot >( slots_count, max_items_per_slot );
 
 }
 
-priority_queue::Priority_Queue::Priority_Queue( Priority_Queue&& other ) : slots_count( other.slots_count ) {
+void priority_queue::Priority_Queue::wait_for_item() const {
 
-  if( ! other.is_valid() ) {
+  std::unique_lock< std::mutex > lock( mutex_mut );
+
+  if( items_count_mut != 0 ) {
+
+    items_count_mut--;
     return;
+
   }
 
-  sem_wait( other.locker_mut.get() );
-
-  locker_mut = std::move( other.locker_mut );
-  is_not_empty_mut = std::move( other.is_not_empty_mut );
-  slots_mut = std::move( other.slots_mut );
-
-  sem_post( locker_mut.get() );
+  signal_mut.wait( lock );
 
 }
 
-bool priority_queue::Priority_Queue::is_valid() const { return !! slots_mut; }
+bool priority_queue::Priority_Queue::is_valid() const noexcept { return !! slots_mut; }
+
+bool priority_queue::Priority_Queue::add_item( std::unique_ptr< Item >&& item, const uint8_t& priority ) noexcept {
+
+  uint8_t current_slot_priority_mut = priority;
+  bool add_item_rslt_mut;
+
+  do {
+
+    add_item_rslt_mut = slots_mut.get()[ current_slot_priority_mut ].add_item( std::move( item ) );
+    current_slot_priority_mut ++;
+
+  } while( ! add_item_rslt_mut && current_slot_priority_mut < slots_count );
+
+  if( add_item_rslt_mut ) {
+
+    std::unique_lock< std::mutex > lock( mutex_mut );
+    items_count_mut ++;
+
+  }
+
+  return add_item_rslt_mut;
+
+}
+
+std::unique_ptr< priority_queue::Item > priority_queue::Priority_Queue::pop() noexcept {
+
+  wait_for_item();
+
+  for( uint8_t _ = 0; _ < slots_count; _ ++ ) {
+
+    std::unique_ptr< Item > popped_item = slots_mut.get()[ _ ].pop();
+
+    if( popped_item ) {
+      return popped_item;
+    }
+
+  }
+
+  return std::unique_ptr< Item >();
+
+}

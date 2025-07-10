@@ -29,27 +29,23 @@ namespace priority_queue {
 
     private:
 
-      const uint32_t max_items;
-
-    private:
-
       bool try_reserve_item();
 
     public:
 
       Priority_Slot( const Priority_Slot& ) = delete;
 
-      Priority_Slot( Priority_Slot&& ) = delete;
-
     public:
 
-      Priority_Slot( const uint32_t& ) noexcept;
+      Priority_Slot();
 
-      bool is_valid() const noexcept;
+      Priority_Slot( Priority_Slot&& );
 
-      bool add_item( std::unique_ptr< Item >&& ) noexcept;
+      bool is_valid() const;
 
-      std::unique_ptr< Item > pop() noexcept;
+      void add_item( std::unique_ptr< Item >&& );
+
+      std::unique_ptr< Item > pop();
 
   };
 
