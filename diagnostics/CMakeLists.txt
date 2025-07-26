@@ -25,3 +25,9 @@ target_link_libraries(
   EXPORT_DIAGNOSTICS_MODULE_COMMON_HEADERS_DIRECTORIES
 
 )
+
+if( DIAGNOSTICS_MODULE_TESTS )
+
+  include( ${DIAGNOSTICS_MODULE_ROOT_DIR}/setup_tests.cmake )
+
+endif()

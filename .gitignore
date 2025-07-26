@@ -1,3 +1,7 @@
 
 ## COMPILER ##
 /build
+
+## BULL ##
+/.vscode
+/.cache

@@ -9,7 +9,7 @@ project(
 
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
-set( CMAKE_CXX_FLAGS "-std=c++17" )
+set( CMAKE_CXX_FLAGS "-std=c++17 -Wall -Wextra -Werror" )
 set( CMAKE_BUILD_TYPE Debug )
 
 
@@ -18,68 +18,32 @@ set( BUILD_BIN_DIR ${BUILD_DIR}/bin )
 set( BUILD_OBJ_DIR ${BUILD_DIR}/obj )
 set( BUILD_LIB_DIR ${BUILD_DIR}/lib )
 
-set( MAIN_FILE_PATH ${CMAKE_SOURCE_DIR}/src/main.cpp )
-
-set( ROOT_DIRECTORY ${CMAKE_SOURCE_DIR} )
-
-set( SUB_DIRECTORIES_COMMUNICATION_PATH ${CMAKE_SOURCE_DIR}/communication/ )
-set( SUB_DIRECTORIES_COMMUNICATION_EXPORT_HEADERS_PATH ${CMAKE_SOURCE_DIR}/communication/export_headers.cmake )
-
-set( SUB_DIRECTORIES_PROTOCOLS_PATH ${CMAKE_SOURCE_DIR}/protocols/ )
-set( SUB_DIRECTORIES_PROTOCOLS_EXPORT_HEADERS_PATH ${CMAKE_SOURCE_DIR}/protocols/export_headers.cmake )
-
-set( SUB_DIRECTORIES_PRIORITY_QUEUE_PATH ${CMAKE_SOURCE_DIR}/priority_queue/ )
-set( SUB_DIRECTORIES_PRIORITY_QUEUE_EXPORT_HEADERS_PATH ${CMAKE_SOURCE_DIR}/priority_queue/export_headers.cmake )
-
-set( SUB_DIRECTORIES_UTILS_PATH ${CMAKE_SOURCE_DIR}/utils/ )
-set( SUB_DIRECTORIES_UTILS_EXPORT_HEADERS_PATH ${CMAKE_SOURCE_DIR}/utils/export_headers.cmake )
-
-set( SUB_DIRECTORIES_DIAGNOSTICS_PATH ${CMAKE_SOURCE_DIR}/diagnostics/ )
-set( SUB_DIRECTORIES_DIAGNOSTICS_EXPORT_HEADERS_PATH ${CMAKE_SOURCE_DIR}/diagnostics/export_headers.cmake )
-
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_BIN_DIR} )
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BUILD_LIB_DIR} )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${BUILD_LIB_DIR} )
 
-include( ${SUB_DIRECTORIES_COMMUNICATION_EXPORT_HEADERS_PATH} )
-include( ${SUB_DIRECTORIES_PROTOCOLS_EXPORT_HEADERS_PATH} )
-include( ${SUB_DIRECTORIES_PRIORITY_QUEUE_EXPORT_HEADERS_PATH} )
-include( ${SUB_DIRECTORIES_UTILS_EXPORT_HEADERS_PATH} )
-include( ${SUB_DIRECTORIES_DIAGNOSTICS_EXPORT_HEADERS_PATH} )
+set( MAIN_FILE_PATH ${CMAKE_SOURCE_DIR}/src/main.cpp )
+set( ROOT_DIRECTORY ${CMAKE_SOURCE_DIR} )
 
-add_subdirectory(
-  ${SUB_DIRECTORIES_COMMUNICATION_PATH}
-)
+set(
 
-add_subdirectory(
-  ${SUB_DIRECTORIES_PROTOCOLS_PATH}
-)
+  MODULE_NAMES
 
-add_subdirectory(
-  ${SUB_DIRECTORIES_PRIORITY_QUEUE_PATH}
-)
+  diagnostics
 
-add_subdirectory(
-  ${SUB_DIRECTORIES_UTILS_PATH}
-)
-
-add_subdirectory(
-  ${SUB_DIRECTORIES_DIAGNOSTICS_PATH}
-)
-
-add_executable(
-  ${CMAKE_PROJECT_NAME}
-  ${MAIN_FILE_PATH}
 )
 
 
-target_link_libraries(
-  ${CMAKE_PROJECT_NAME}
-  COMMUNICATION_MODULE
-  PROTOCOLS_MODULE
-  PRIORITY_QUEUE_MODULE
-  DIAGNOSTICS_MODULE
-  # UTILS_MODULE
-)
+foreach(module_name IN LISTS MODULE_NAMES)
 
-include( setup_tests.cmake )
+  include( ${CMAKE_SOURCE_DIR}/${module_name}/export_headers.cmake )
+
+endforeach()
+
+enable_testing()
+
+foreach(module_name IN LISTS MODULE_NAMES)
+
+  add_subdirectory( ${CMAKE_SOURCE_DIR}/${module_name} )
+
+endforeach()
