@@ -31,6 +31,7 @@ set(
 
   priority_queue
   diagnostics
+  utils
 
 )
 
