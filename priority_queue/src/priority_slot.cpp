@@ -1,31 +1,17 @@
 
 #include "priority_slot.h"
-#include "item.h"
-#include <cstdint>
-#include <semaphore.h>
-#include <utility>
-#include "validation.h"
-#include <iostream>
+#include <memory>
 
 
-priority_queue::Priority_Slot::Priority_Slot( const uint32_t& max_items ) noexcept : first_mut(), last_mut( first_mut.get() ), items_count( 0 ), max_items( max_items ), status_mut( INVALID ) {
+priority_queue::Priority_Slot::Priority_Slot() noexcept : items_count( 0 ), first_mut(), next( nullptr ) {}
 
-  const int locker_mut_sts = sem_init( &locker_mut, 0, 1 );
-  if( locker_mut_sts != 0 ) {
-    return;
-  }
-
-  status_mut = VALID;
-
-}
-
-bool priority_queue::Priority_Slot::try_reserve_item() {
+bool priority_queue::Priority_Slot::try_reserve() const noexcept {
   
   uint32_t current_count = items_count.load();
 
   while( current_count != 0 ) {
 
-    if( items_count.compare_exchange_strong( current_count, current_count - 1 ) ) {
+    if( items_count.compare_exchange_weak( current_count, current_count - 1 ) ) {
       return true;
     }
 
@@ -35,57 +21,36 @@ bool priority_queue::Priority_Slot::try_reserve_item() {
 
 }
 
-bool priority_queue::Priority_Slot::is_valid() const noexcept { return status_mut == Status::VALID; }
+void priority_queue::Priority_Slot::add_item( Item&& item ) noexcept {
 
-bool priority_queue::Priority_Slot::add_item( std::unique_ptr< Item >&& item ) noexcept {
-
-  sem_wait( &locker_mut );
-
-  if( items_count.load() == max_items ) {
-    sem_post( &locker_mut );
-    return false;
-  }
-
-  Item* new_last_mut_value_mut = item.get();
+  std::lock_guard< std::mutex > lock( mutex_mut );
 
   if( ! first_mut ) {
 
-    first_mut = std::move( item );
-    last_mut = new_last_mut_value_mut;
+    first_mut = std::make_unique< Item >( std::move( item ) );
+    next = &first_mut->get_next();
 
   }
 
   else {
 
-    std::unique_ptr< Item >& last_item_next_ref_mut = last_mut->get_next();
-    ENSURE( ! last_item_next_ref_mut );
-    
-    last_item_next_ref_mut.swap( item );
-    last_mut = new_last_mut_value_mut;
+    *next = std::make_unique< Item >( std::move( item ) );
+    next = &(*next)->get_next();
 
   }
 
-  sem_post( &locker_mut );
-
   items_count.fetch_add( 1 );
-
-  return true;
 
 }
 
 std::unique_ptr< priority_queue::Item > priority_queue::Priority_Slot::pop() noexcept {
 
-  if( ! try_reserve_item() ) {
-    return std::unique_ptr< Item >();
+  if( ! try_reserve() ) {
+    return nullptr;
   }
 
-  sem_wait( &locker_mut );
+  std::lock_guard< std::mutex > lock( mutex_mut );
 
-  std::unique_ptr< Item > popped_item = std::move( first_mut );
-  first_mut = std::move( popped_item->get_next() );
-
-  sem_post( &locker_mut );
-
-  return popped_item;
+  return std::move( first_mut );
 
 }

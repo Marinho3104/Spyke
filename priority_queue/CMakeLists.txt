@@ -29,3 +29,9 @@ target_link_libraries(
   EXPORT_DIAGNOSTICS_MODULE_COMMON_HEADERS_DIRECTORIES
 
 )
+
+if( PRIORITY_QUEUE_MODULE_TESTS )
+
+  include( setup_tests.cmake )
+
+endif()

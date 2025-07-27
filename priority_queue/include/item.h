@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <memory>
+
 namespace priority_queue {
 
   class Item {
@@ -27,16 +28,20 @@ namespace priority_queue {
 
       Item( std::unique_ptr< uint8_t[] >&&, const uint32_t& ) noexcept;
 
-      bool is_valid() const noexcept;
+      Item( Item&& ) noexcept;
 
-      std::unique_ptr< Item >& get_next() noexcept;
+      bool is_valid() const noexcept;
 
       const std::unique_ptr< uint8_t[] >& get_data() const noexcept;
 
       const uint32_t& get_data_size() const noexcept;
 
+      std::unique_ptr< Item >& get_next() noexcept;
+
+      void set_next( std::unique_ptr< Item >&& ) noexcept;
+
   };
 
 }
 
-#endif
+#endif // INCLUDE_PRIORITY_QUEUE_ITEM_H_

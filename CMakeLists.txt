@@ -29,6 +29,7 @@ set(
 
   MODULE_NAMES
 
+  priority_queue
   diagnostics
 
 )
