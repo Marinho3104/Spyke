@@ -29,6 +29,8 @@ set(
 
   MODULE_NAMES
 
+  utils
+
 )
 
 
