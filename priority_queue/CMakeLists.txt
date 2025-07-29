@@ -7,7 +7,7 @@ set(
 
   ## PRIOTIY QUEUE ##
   ${PRIORITY_QUEUE_MODULE_ROOT_DIR}/src/item.cpp
-  # ${PRIORITY_QUEUE_MODULE_ROOT_DIR}/src/priority_queue.cpp
+  ${PRIORITY_QUEUE_MODULE_ROOT_DIR}/src/priority_queue.cpp
   ${PRIORITY_QUEUE_MODULE_ROOT_DIR}/src/priority_slot.cpp
   
 )

@@ -39,7 +39,7 @@ namespace priority_queue {
 
       bool is_priority_value_valid( const uint32_t& ) const noexcept;
 
-      bool add_item( Item&&, const uint32_t& ) noexcept;
+      bool add_item( std::unique_ptr< Item >&&, const uint32_t& ) noexcept;
 
       std::unique_ptr< Item > pop() noexcept;
 

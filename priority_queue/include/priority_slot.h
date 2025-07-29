@@ -31,7 +31,7 @@ namespace priority_queue {
 
       Priority_Slot() noexcept;
 
-      void add_item( Item&& ) noexcept;
+      void add_item( std::unique_ptr< Item >&& ) noexcept;
 
       std::unique_ptr< Item > pop() noexcept;
 

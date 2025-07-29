@@ -35,7 +35,7 @@ bool priority_queue::Priority_Queue::is_priority_value_valid( const uint32_t& pr
   return priority_value < slots_count;
 }
 
-bool priority_queue::Priority_Queue::add_item( Item&& item, const uint32_t& priority ) noexcept {
+bool priority_queue::Priority_Queue::add_item( std::unique_ptr< Item >&&  item, const uint32_t& priority ) noexcept {
 
   CHECK( is_priority_value_valid( priority ), "Priority value is not valid" )
 
@@ -63,7 +63,7 @@ std::unique_ptr< priority_queue::Item > priority_queue::Priority_Queue::pop() no
     std::unique_ptr< Item > item = slots_mut[ i ].pop();
 
     if( item ) {
-      return item;
+      return  item;
     }
     
   }

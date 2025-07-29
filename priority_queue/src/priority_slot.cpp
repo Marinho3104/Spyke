@@ -21,20 +21,20 @@ bool priority_queue::Priority_Slot::try_reserve() const noexcept {
 
 }
 
-void priority_queue::Priority_Slot::add_item( Item&& item ) noexcept {
+void priority_queue::Priority_Slot::add_item( std::unique_ptr< Item >&& item ) noexcept {
 
   std::lock_guard< std::mutex > lock( mutex_mut );
 
   if( ! first_mut ) {
 
-    first_mut = std::make_unique< Item >( std::move( item ) );
+    first_mut = std::move( item );
     next = &first_mut->get_next();
 
   }
 
   else {
 
-    *next = std::make_unique< Item >( std::move( item ) );
+    *next = std::move( item );
     next = &(*next)->get_next();
 
   }
@@ -51,6 +51,8 @@ std::unique_ptr< priority_queue::Item > priority_queue::Priority_Slot::pop() noe
 
   std::lock_guard< std::mutex > lock( mutex_mut );
 
-  return std::move( first_mut );
+  std::unique_ptr< Item > rtr = std::move( first_mut );
+  first_mut = std::move( rtr->get_next() );
+  return rtr;
 
 }
