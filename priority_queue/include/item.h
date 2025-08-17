@@ -11,10 +11,13 @@ namespace priority_queue {
 
     private:
 
+      // Just to let the Priority_Slot class access the next_mut field
+      friend class Priority_Slot;
+
       std::unique_ptr< uint8_t[] > data_mut;
       std::unique_ptr< Item > next_mut;
 
-    private:
+    public:
 
       const uint32_t data_size;
   
@@ -32,13 +35,7 @@ namespace priority_queue {
 
       bool is_valid() const noexcept;
 
-      const std::unique_ptr< uint8_t[] >& get_data() const noexcept;
-
-      const uint32_t& get_data_size() const noexcept;
-
-      std::unique_ptr< Item >& get_next() noexcept;
-
-      void set_next( std::unique_ptr< Item >&& ) noexcept;
+      const uint8_t* get_data() const noexcept;
 
   };
 

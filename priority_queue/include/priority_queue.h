@@ -7,6 +7,7 @@
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
+
 namespace priority_queue {
 
   class Priority_Queue {
@@ -27,6 +28,8 @@ namespace priority_queue {
 
       void wait_for_item() const noexcept;
 
+      bool is_priority_value_valid( const uint32_t& ) const noexcept;
+
     public:
 
       Priority_Queue() = delete;
@@ -37,9 +40,7 @@ namespace priority_queue {
 
       Priority_Queue( const uint32_t&, const uint32_t& ) noexcept;
 
-      bool is_priority_value_valid( const uint32_t& ) const noexcept;
-
-      bool add_item( std::unique_ptr< Item >&&, const uint32_t& ) noexcept;
+      bool add_item( std::unique_ptr< Item >, const uint32_t& ) noexcept;
 
       std::unique_ptr< Item > pop() noexcept;
 

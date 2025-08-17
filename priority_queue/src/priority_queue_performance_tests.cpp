@@ -18,7 +18,7 @@ int main () {
 
 void single_thread_test( const uint32_t& items_count ) {
 
-  const uint32_t iterations_count = 5;
+  const uint32_t iterations_count = 150;
   LOG_INFO( "Performing single thread test with %u items!", items_count );
 
   priority_queue::Priority_Queue queue = priority_queue::Priority_Queue( 1, items_count );
@@ -30,8 +30,7 @@ void single_thread_test( const uint32_t& items_count ) {
     std::vector<std::unique_ptr<priority_queue::Item>> payloads;
     for( uint32_t i = 0; i < items_count; i++ ) {
       payloads.push_back( std::make_unique< priority_queue::Item >( priority_queue::Item( std::make_unique< uint8_t[] >( 8 ), 8 ) ) );
-    }
-    
+    }    
 
     std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();   
 
@@ -47,7 +46,7 @@ void single_thread_test( const uint32_t& items_count ) {
     start = std::chrono::high_resolution_clock::now();   
 
     for( uint32_t j = 0; j < items_count; j++ ) {
-      queue.pop();
+      queue.pop().release();
     }
 
     end = std::chrono::high_resolution_clock::now();   

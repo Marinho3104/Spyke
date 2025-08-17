@@ -3,10 +3,7 @@
 #define INCLUDE_PRIORITY_QUEUE_PRIORITY_SLOT_H_
 
 #include "item.h"
-#include <cstdint>
-#include <memory>
 #include <mutex>
-#include <atomic>
 
 namespace priority_queue {
 
@@ -14,14 +11,9 @@ namespace priority_queue {
 
     private:
 
-      mutable std::atomic< uint32_t > items_count;
-      std::unique_ptr< Item > first_mut;
-      std::unique_ptr< Item >* next;
       mutable std::mutex mutex_mut;
-
-    private:
-
-      bool try_reserve() const noexcept;
+      std::unique_ptr< Item > first_mut;
+      Item *last_mut;
 
     public:
 
@@ -33,7 +25,7 @@ namespace priority_queue {
 
       void add_item( std::unique_ptr< Item >&& ) noexcept;
 
-      std::unique_ptr< Item > pop() noexcept;
+      std::unique_ptr<Item> pop() noexcept;
 
   };
 
