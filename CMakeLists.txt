@@ -29,6 +29,9 @@ set(
 
   MODULE_NAMES
 
+  diagnostics
+  node
+
 )
 
 
