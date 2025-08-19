@@ -32,7 +32,7 @@ void single_thread_normal_test() {
       reinterpret_cast< uint32_t* >( item_content.get() )[ 0 ] = i;
       reinterpret_cast< uint32_t* >( item_content.get() )[ 1 ] = j;
 
-      std::unique_ptr< priority_queue::Item > item = std::make_unique< priority_queue::Item >( std::move( item_content ), 8 );
+      priority_queue::Item item = priority_queue::Item( std::move( item_content ), 8 );
       assert( queue.add_item( std::move( item ), i ) );
 
     }

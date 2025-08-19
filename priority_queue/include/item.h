@@ -11,11 +11,13 @@ namespace priority_queue {
 
     private:
 
-      // Just to let the Priority_Slot class access the next_mut field
       friend class Priority_Slot;
 
       std::unique_ptr< uint8_t[] > data_mut;
-      std::unique_ptr< Item > next_mut;
+
+    private: 
+
+      Item() noexcept;
 
     public:
 
@@ -24,8 +26,6 @@ namespace priority_queue {
     public:
 
       Item( const Item& ) = delete;
-
-      Item() = delete;
 
     public:
 

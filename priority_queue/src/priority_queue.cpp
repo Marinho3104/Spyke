@@ -1,17 +1,20 @@
 
 #include "priority_queue.h"
+#include "item.h"
+#include "smart_pointers.hpp"
 #include "validation.h"
 #include <cstdint>
+#include <optional>
 
 
-priority_queue::Priority_Queue::Priority_Queue( const uint32_t& slots_count, const uint32_t& max_items ) noexcept : slots_mut( std::make_unique< Priority_Slot[] >( slots_count ) ),
+priority_queue::Priority_Queue::Priority_Queue( const uint32_t& slots_count, const uint32_t& max_items ) noexcept : slots( utils::make_unique_array_with_args< Priority_Slot >( slots_count, max_items, items_count ) ),
   items_count( 0 ), state_mut( State::INACTIVE ), max_items_count( max_items ), slots_count( slots_count ) {}
 
-priority_queue::Priority_Queue::Priority_Queue( Priority_Queue&& other ) noexcept : items_count( other.items_count ), state_mut( State::INACTIVE ), max_items_count( other.max_items_count ), 
+priority_queue::Priority_Queue::Priority_Queue( Priority_Queue&& other ) noexcept : items_count( other.items_count.load() ), state_mut( State::INACTIVE ), max_items_count( other.max_items_count ), 
   slots_count( other.slots_count ) {
     
     CHECK( ! other.is_active(), "Cannot move an active priority queue" )
-    slots_mut = std::move( other.slots_mut );
+    slots = std::move( other.slots );
 
 }
 
@@ -64,6 +67,7 @@ void priority_queue::Priority_Queue::wait_for_item() const noexcept {
     }
 
     items_count --;
+    reserved_count --;
 
     return true;
 
@@ -81,7 +85,7 @@ bool priority_queue::Priority_Queue::is_active() const noexcept { return state_m
 
 bool priority_queue::Priority_Queue::is_sealed() const noexcept { return state_mut == State::SEALED; }
 
-bool priority_queue::Priority_Queue::add_item( std::unique_ptr< Item > item, const uint32_t& priority ) noexcept {
+bool priority_queue::Priority_Queue::add_item( Item item, const uint32_t& priority ) noexcept {
 
   CHECK( is_priority_value_valid( priority ), "Priority value is not valid" )
   CHECK( is_active(), "Priority queue is not active" )
@@ -89,24 +93,31 @@ bool priority_queue::Priority_Queue::add_item( std::unique_ptr< Item > item, con
   // To maintain performance, we perform a loose check.
   // If multiple threads reach this point concurrently, it's possible
   // that the queue may temporarily exceed the user-specified capacity.
-  if( items_count >= max_items_count ) {
-    return false;
+  uint32_t current_items_count = reserved_count.load();
+
+  while( true ) {
+
+    if( reserved_count.compare_exchange_weak( current_items_count, current_items_count + 1 ) ) {
+      break;
+    }
+
+    if( reserved_count == max_items_count ) {
+      return false;
+    }
+
   }
 
-  slots_mut[ priority ].add_item( std::move( item ) );
 
-  {
-    std::unique_lock< std::mutex > lock( mutex_mut );
-    items_count ++;
-  }
 
-  signal_mut.notify_one();
+  slots[ priority ].add_item( std::move( item ) );
+
+  // signal_mut.notify_one();
 
   return true;
 
 }
 
-std::unique_ptr< priority_queue::Item > priority_queue::Priority_Queue::pop() noexcept {
+std::optional< priority_queue::Item > priority_queue::Priority_Queue::pop() noexcept {
 
   CHECK( is_active() || is_sealed(), "Priority queue is not active nor sealed" )
 
@@ -117,14 +128,14 @@ std::unique_ptr< priority_queue::Item > priority_queue::Priority_Queue::pop() no
 
   for( uint32_t i = 0; i < slots_count; i++ ) {
 
-    std::unique_ptr< Item > item_mut = slots_mut[ i ].pop();
+    Item item_mut = slots[ i ].pop();
 
-    if( item_mut ) {
+    if( item_mut.is_valid() ) {
       return  item_mut;
     }
     
   }
 
-  return std::unique_ptr< Item >();
+  return std::nullopt;
 
 }

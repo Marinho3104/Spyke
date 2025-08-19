@@ -1,44 +1,51 @@
 
 #include "priority_slot.h"
+#include "log.h"
+#include <cstdint>
+#include <memory>
 
 
-priority_queue::Priority_Slot::Priority_Slot() noexcept : first_mut( nullptr ), last_mut( nullptr ) {}
+priority_queue::Priority_Slot::Priority_Slot( const uint32_t& pool_size, std::atomic< uint32_t >& actual_counter ) noexcept : 
+  pool_mut( new Item[ pool_size ] ), actual_counter( actual_counter ), pool_size( pool_size ) {}
 
-void priority_queue::Priority_Slot::add_item( std::unique_ptr< Item >&& item ) noexcept {
+uint32_t priority_queue::Priority_Slot::increment_index( const uint32_t& index ) const noexcept {
+  return ( index + 1 ) % pool_size;
+}
 
-  std::lock_guard< std::mutex > lock( mutex_mut );
+void priority_queue::Priority_Slot::add_item( Item&& item ) noexcept {
 
-  if( ! first_mut ) {
+  uint32_t index_mut = add_index_mut.load();
 
-    first_mut = std::move( item );
-    last_mut = first_mut.get();
+  while( true ) {
+
+    if( add_index_mut.compare_exchange_weak( index_mut, increment_index( index_mut ) ) ) {
+      break;
+    }
 
   }
 
-  else {
-
-    last_mut->next_mut = std::move( item );
-    last_mut = last_mut->next_mut.get();
-
-  }
+  new( &pool_mut[ index_mut ] ) Item( std::move( item ) );
+  pop_max_index_mut.fetch_add( 1 );
+  actual_counter.fetch_add( 1 );
 
 }
 
-std::unique_ptr< priority_queue::Item > priority_queue::Priority_Slot::pop() noexcept {
+priority_queue::Item priority_queue::Priority_Slot::pop() noexcept {
 
-  std::lock_guard< std::mutex > lock( mutex_mut );
+  uint32_t index_mut = pop_index_mut.load();
 
-  if( ! first_mut ) {
-    return std::unique_ptr< Item >();
+  while( true ) {
+
+    if( pop_index_mut.compare_exchange_weak( index_mut, increment_index( pop_index_mut ) ) ) {
+      break;
+    }
+
+    if( index_mut == pop_max_index_mut.load() ) {
+      return Item();
+    }
+
   }
 
-  // Even when we are popping the last item on the queue, there is no need
-  // to set the last_mut to nullptr. Because this action is performed in a thread safe space
-  // and the last_mut is only used if the first_mut is not nullptr. And we set the first_mut
-  // to nullptr when we pop the last item.
-  std::unique_ptr< Item > rtr = std::move( first_mut );
-  first_mut = std::move( rtr->next_mut );
-
-  return rtr;
+  return std::move( pool_mut[ index_mut ] );
 
 }

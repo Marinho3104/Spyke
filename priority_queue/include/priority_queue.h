@@ -7,6 +7,8 @@
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
+#include <optional>
+#include "smart_pointers.hpp"
 
 namespace priority_queue {
 
@@ -22,10 +24,9 @@ namespace priority_queue {
 
     private:
 
-      std::atomic< uint32_t > c;
-
-      std::unique_ptr< Priority_Slot[] > slots_mut;
-      mutable uint32_t items_count;
+      utils::unique_array_with_args_return_type< Priority_Slot > slots;
+      mutable std::atomic< uint32_t > items_count;
+      mutable std::atomic< uint32_t > reserved_count;
       mutable std::condition_variable signal_mut, signal_empty_mut;
       mutable std::mutex mutex_mut, is_empty_mutex_mut;
       std::atomic< State > state_mut;
@@ -63,9 +64,9 @@ namespace priority_queue {
 
       void wait_until_empty() const noexcept;
 
-      bool add_item( std::unique_ptr< Item >, const uint32_t& ) noexcept;
+      bool add_item( Item, const uint32_t& ) noexcept;
 
-      std::unique_ptr< Item > pop() noexcept;
+      std::optional< Item > pop() noexcept;
 
   };
 

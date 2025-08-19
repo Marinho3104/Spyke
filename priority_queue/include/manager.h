@@ -42,7 +42,7 @@ namespace priority_queue {
       // This function will only return when all the workers have finished
       void start() noexcept;
 
-      void add_item( std::unique_ptr< Item >, const uint32_t& ) noexcept;
+      void add_item( Item, const uint32_t& ) noexcept;
 
       void seal_priority_queue() noexcept;
 
@@ -70,8 +70,8 @@ namespace priority_queue {
   }
 
   template< typename Worker_Type, uint8_t N >
-  void priority_queue::Manager< Worker_Type, N >::add_item( std::unique_ptr< Item > item, const uint32_t& priority ) noexcept {
-    queue_mut.add_item( std::move( item ), priority );
+  void priority_queue::Manager< Worker_Type, N >::add_item( Item , const uint32_t&  ) noexcept {
+    // queue_mut.add_item( std::move( item ), priority );
   }
 
   template< typename Worker_Type, uint8_t N >

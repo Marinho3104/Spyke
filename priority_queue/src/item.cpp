@@ -4,6 +4,8 @@
 #include <cstdint>
 
 
+priority_queue::Item::Item() noexcept: data_mut( nullptr ), data_size( 0 ) {}
+
 priority_queue::Item::Item( std::unique_ptr< uint8_t[] >&& data_mut, const uint32_t& data_size ) noexcept : data_mut( std::move( data_mut ) ), data_size( data_size ) {}
 
 priority_queue::Item::Item( Item&& other ) noexcept : data_mut( std::move( other.data_mut ) ), data_size( other.data_size ) {}

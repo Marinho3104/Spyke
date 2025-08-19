@@ -13,7 +13,7 @@ void multi_thread_test( const uint32_t& );
 
 int main () {
 
-  single_thread_test( 100000 );
+  // single_thread_test( 100000 );
   multi_thread_test( 100000 );
   
   return 0;
@@ -23,7 +23,7 @@ int main () {
 
 void single_thread_test( const uint32_t& items_count ) {
 
-  const uint32_t iterations_count = 15;
+  const uint32_t iterations_count = 1;
   LOG_INFO( "Performing single thread test with %u items!", items_count );
 
   priority_queue::Priority_Queue queue = priority_queue::Priority_Queue( 1, items_count );
@@ -33,9 +33,9 @@ void single_thread_test( const uint32_t& items_count ) {
 
   for( uint32_t i = 0; i < iterations_count; i++ ) {
 
-    std::vector<std::unique_ptr<priority_queue::Item>> payloads;
+    std::vector<priority_queue::Item> payloads;
     for( uint32_t i = 0; i < items_count; i++ ) {
-      payloads.push_back( std::make_unique< priority_queue::Item >( priority_queue::Item( std::make_unique< uint8_t[] >( 8 ), 8 ) ) );
+      payloads.push_back( priority_queue::Item( priority_queue::Item( std::make_unique< uint8_t[] >( 8 ), 8 ) ) );
     }    
 
     std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();   
@@ -52,7 +52,7 @@ void single_thread_test( const uint32_t& items_count ) {
     start = std::chrono::high_resolution_clock::now();   
 
     for( uint32_t j = 0; j < items_count; j++ ) {
-      queue.pop().release();
+      queue.pop();
     }
 
     end = std::chrono::high_resolution_clock::now();   
@@ -83,11 +83,11 @@ class Custom_Worker: public priority_queue::Worker {
 void multi_thread_test( const uint32_t& items_count ) {
 
   LOG_INFO( "Performing multi-thread test with %u items!", items_count );
-  const uint32_t iterations_count = 10;
+  const uint32_t iterations_count = 2;
 
-  const uint32_t threads_count = 6;
+  const uint32_t threads_count = 12;
   const uint32_t items_count_per_thread_add = items_count / threads_count; 
-  const uint32_t priority_level = 6;
+  const uint32_t priority_level = 12;
 
   double time_taken[ threads_count ] = { 0. };
   double final_count = 0.;
@@ -102,15 +102,17 @@ void multi_thread_test( const uint32_t& items_count ) {
     auto add_items_fun = [ &manager, &items_count_per_thread_add, &time_taken ]( int index ) {
 
       std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-      std::vector<std::unique_ptr<priority_queue::Item>> payloads;
+      std::vector<priority_queue::Item> payloads;
+      std::vector<uint32_t> priorities;
       for( uint32_t i = 0; i < items_count_per_thread_add; i++ ) {
-          payloads.push_back( std::make_unique< priority_queue::Item >( priority_queue::Item( std::make_unique< uint8_t[] >( 8 ), 8 ) ) );
+          payloads.push_back( priority_queue::Item( priority_queue::Item( std::make_unique< uint8_t[] >( 8 ), 8 ) ) );
+          priorities.push_back( std::rand() % priority_level );
       };
 
       std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();   
 
       for( uint32_t i = 0; i < items_count_per_thread_add; i++ ) {
-          manager.add_item( std::move( payloads[ i ] ), std::rand() % priority_level );
+          manager.add_item( std::move( payloads[ i ] ), priorities[ i ] );
       }
 
       std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();   

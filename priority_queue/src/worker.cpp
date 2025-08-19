@@ -2,6 +2,7 @@
 #include "worker.h"
 #include "item.h"
 #include "log.h"
+#include <optional>
 
 
 priority_queue::Worker::Worker( Priority_Queue& queue_mut ) noexcept : queue_mut( queue_mut ) {}
@@ -10,7 +11,7 @@ void priority_queue::Worker::start() noexcept {
 
   while( true ) {
 
-    std::unique_ptr< Item > item_mut = queue_mut.pop();
+    std::optional< Item > item_mut = queue_mut.pop();
 
     // The queue will only return a null object if it was sealed and no
     // more Item are inside the queue
