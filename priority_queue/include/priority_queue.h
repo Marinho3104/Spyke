@@ -14,10 +14,21 @@ namespace priority_queue {
 
     private:
 
+      enum State: uint8_t {
+        ACTIVE = 0,
+        INACTIVE = 1,
+        SEALED = 2
+      };
+
+    private:
+
+      std::atomic< uint32_t > c;
+
       std::unique_ptr< Priority_Slot[] > slots_mut;
-      mutable std::atomic< uint32_t > items_count;
-      mutable std::condition_variable signal_mut;
-      mutable std::mutex mutex_mut;
+      mutable uint32_t items_count;
+      mutable std::condition_variable signal_mut, signal_empty_mut;
+      mutable std::mutex mutex_mut, is_empty_mutex_mut;
+      std::atomic< State > state_mut;
 
     private:
 
@@ -30,6 +41,10 @@ namespace priority_queue {
 
       bool is_priority_value_valid( const uint32_t& ) const noexcept;
 
+      bool is_active() const noexcept;
+      
+      bool is_sealed() const noexcept;
+
     public:
 
       Priority_Queue() = delete;
@@ -39,6 +54,14 @@ namespace priority_queue {
     public:
 
       Priority_Queue( const uint32_t&, const uint32_t& ) noexcept;
+
+      Priority_Queue( Priority_Queue&& ) noexcept;
+
+      void activate() noexcept;
+
+      void seal() noexcept;
+
+      void wait_until_empty() const noexcept;
 
       bool add_item( std::unique_ptr< Item >, const uint32_t& ) noexcept;
 

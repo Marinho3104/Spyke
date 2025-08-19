@@ -1,0 +1,8 @@
+
+1
+  INFO: [/home/marinho/Projects/Spyke/priority_queue/src/priority_queue_performance_tests.cpp:27] Performing single thread test with 100000 items!
+  INFO: [/home/marinho/Projects/Spyke/priority_queue/src/priority_queue_performance_tests.cpp:67] Average time it took to add 100000 items: 0.020598 seconds
+  INFO: [/home/marinho/Projects/Spyke/priority_queue/src/priority_queue_performance_tests.cpp:68] Average time it took to remove 100000 items: 0.027752 seconds
+  INFO: [/home/marinho/Projects/Spyke/priority_queue/src/priority_queue_performance_tests.cpp:85] Performing multi-thread test with 100000 items!
+  INFO: [/home/marinho/Projects/Spyke/priority_queue/src/priority_queue_performance_tests.cpp:154] Average time it took to add 100000 items: 0.043325 seconds
+2
