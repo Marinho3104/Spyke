@@ -1,141 +1,95 @@
 
 #include "priority_queue.h"
-#include "item.h"
 #include "smart_pointers.hpp"
-#include "validation.h"
 #include <cstdint>
-#include <optional>
+#include <thread>
+#include <chrono>
+
+priority_queue::Batched_Slot::Object::Object() noexcept : item(), valid( ATOMIC_FLAG_INIT ) {}
 
 
-priority_queue::Priority_Queue::Priority_Queue( const uint32_t& slots_count, const uint32_t& max_items ) noexcept : slots( utils::make_unique_array_with_args< Priority_Slot >( slots_count, max_items, items_count ) ),
-  items_count( 0 ), state_mut( State::INACTIVE ), max_items_count( max_items ), slots_count( slots_count ) {}
+priority_queue::Batched_Slot::Batched_Slot( const uint32_t& pool_size ) noexcept : batched_pool( std::make_unique< Object[] >( pool_size ) ), index( 0 ), actual( 0 ), pool_size( pool_size ) {}
 
-priority_queue::Priority_Queue::Priority_Queue( Priority_Queue&& other ) noexcept : items_count( other.items_count.load() ), state_mut( State::INACTIVE ), max_items_count( other.max_items_count ), 
-  slots_count( other.slots_count ) {
-    
-    CHECK( ! other.is_active(), "Cannot move an active priority queue" )
-    slots = std::move( other.slots );
+uint32_t priority_queue::Batched_Slot::reserve_spot() noexcept {
 
-}
+  const uint32_t reserved_spot_index = index.fetch_add( 1 );
 
-void priority_queue::Priority_Queue::activate() noexcept { 
+  if( reserved_spot_index >= pool_size ) {
+    index.fetch_sub( 1 );
+    return pool_size;
+  }
 
-  CHECK( ! is_active(), "Priority queue is already active")
-
-  state_mut.store( State::ACTIVE ); 
-
-}
-
-void priority_queue::Priority_Queue::seal() noexcept { 
-
-  CHECK( ! is_sealed(), "Priority queue is already sealed" )
-
-  state_mut.store( State::SEALED );
-
-  signal_mut.notify_all();
+  return reserved_spot_index;
 
 }
 
-void priority_queue::Priority_Queue::wait_until_empty() const noexcept {
-  
-  CHECK( is_sealed(), "Priority queue is not sealed" )
 
-  std::unique_lock< std::mutex > lock( is_empty_mutex_mut );
+priority_queue::Priority_Queue::~Priority_Queue() noexcept {
 
-  auto is_empty = [ this ]() {
-    return items_count == 0;
-  };
-
-  signal_mut.wait( lock, is_empty );
+  while( ! is_deactivated() ) {
+    std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
+  }
 
 }
 
-void priority_queue::Priority_Queue::wait_for_item() const noexcept {
+priority_queue::Priority_Queue::Priority_Queue( const uint8_t& max_priority, const uint32_t& pool_size ) noexcept : 
+  max_priority( max_priority ), pool_size( pool_size ), batched_slots( utils::make_unique_array_with_args< Batched_Slot >( max_priority, pool_size ) ), slots( utils::make_unique_array_with_args< Priority_Slot >( max_priority, pool_size ) ) {}
 
-  std::unique_lock< std::mutex > lock( mutex_mut );
+bool priority_queue::Priority_Queue::is_active() const noexcept { return state == ACTIVE; }
 
-  auto decrement_items_count = [ this ]() {
-    
-    uint32_t current_count = items_count;
+bool priority_queue::Priority_Queue::is_sealed() const noexcept { return state == SEALED; }
 
-    if( current_count == 0 ) {
-      return is_sealed();
+bool priority_queue::Priority_Queue::is_deactivated() const noexcept { return state == DEACTIVATED; }
+
+void priority_queue::Priority_Queue::add_batched_items() noexcept {
+
+  while( ! is_sealed() ) {
+
+    std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
+
+    for( uint8_t i = 0; i < max_priority; i++ ) {
+
+      batched_slots[ i ].actual.store( batched_slots[ i ].index.load() );
+
+      //
+      // if( batched_slots[ i ].index.load() == 0 ) {
+      //   continue;
+      // }
+      //
+      // slots[ i ].add_items( batched_slots[ i ].batched_pool.get(), batched_slots[ i ].index.load() );
+      //
     }
 
-    if( current_count == 1 ) {
-      signal_empty_mut.notify_all();
-    }
+  }
 
-    items_count --;
-    reserved_count --;
-
-    return true;
-
-  };
-
-  signal_mut.wait( lock, decrement_items_count );
+  state = DEACTIVATED;
 
 }
 
-bool priority_queue::Priority_Queue::is_priority_value_valid( const uint32_t& priority_value ) const noexcept {
-  return priority_value < slots_count;
+void priority_queue::Priority_Queue::activate() noexcept {
+  std::thread add_batched_items_thread = std::thread( &Priority_Queue::add_batched_items, this );
+  add_batched_items_thread.detach();
+  state = ACTIVE;
 }
 
-bool priority_queue::Priority_Queue::is_active() const noexcept { return state_mut == State::ACTIVE; }
+void priority_queue::Priority_Queue::seal() noexcept {
+  state = SEALED;
+}
 
-bool priority_queue::Priority_Queue::is_sealed() const noexcept { return state_mut == State::SEALED; }
+void priority_queue::Priority_Queue::deactivate() noexcept {
+  state = INACTIVE;
+}
 
 bool priority_queue::Priority_Queue::add_item( Item item, const uint32_t& priority ) noexcept {
 
-  CHECK( is_priority_value_valid( priority ), "Priority value is not valid" )
-  CHECK( is_active(), "Priority queue is not active" )
+  const uint32_t reserved_spot_index = batched_slots[ priority ].reserve_spot();
 
-  // To maintain performance, we perform a loose check.
-  // If multiple threads reach this point concurrently, it's possible
-  // that the queue may temporarily exceed the user-specified capacity.
-  uint32_t current_items_count = reserved_count.load();
-
-  while( true ) {
-
-    if( reserved_count.compare_exchange_weak( current_items_count, current_items_count + 1 ) ) {
-      break;
-    }
-
-    if( reserved_count == max_items_count ) {
-      return false;
-    }
-
+  if( reserved_spot_index == pool_size ) {
+    return false;
   }
 
-
-
-  slots[ priority ].add_item( std::move( item ) );
-
-  // signal_mut.notify_one();
+  new( &batched_slots[ priority ].batched_pool[ reserved_spot_index ].item ) Item( std::move( item ) );
 
   return true;
-
-}
-
-std::optional< priority_queue::Item > priority_queue::Priority_Queue::pop() noexcept {
-
-  CHECK( is_active() || is_sealed(), "Priority queue is not active nor sealed" )
-
-  // This function will only  return in one of the following cases:
-  //  1. There is at least one item in the queue, which was succesfully reserved
-  //  2. The queue is sealed and there are no more items in the queue
-  wait_for_item();
-
-  for( uint32_t i = 0; i < slots_count; i++ ) {
-
-    Item item_mut = slots[ i ].pop();
-
-    if( item_mut.is_valid() ) {
-      return  item_mut;
-    }
-    
-  }
-
-  return std::nullopt;
 
 }

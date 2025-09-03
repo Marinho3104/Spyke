@@ -4,7 +4,6 @@
 
 #include <cstdint>
 #include <memory>
-#include <atomic>
 
 namespace priority_queue {
 
@@ -15,7 +14,6 @@ namespace priority_queue {
       friend class Priority_Slot;
 
       std::unique_ptr< uint8_t[] > data_mut;
-      std::atomic< bool > valid_mut;
 
     private: 
 

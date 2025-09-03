@@ -16,7 +16,7 @@ namespace priority_queue {
 
       std::unique_ptr< Item[] > pool_mut;
       uint32_t pop_index_mut, add_index_mut;
-      std::mutex mutex_mut;
+      std::mutex& mutex_mut;
       
     private:
 
@@ -30,9 +30,9 @@ namespace priority_queue {
 
     public:
 
-      Priority_Slot( const uint32_t& ) noexcept;
+      Priority_Slot( const uint32_t&, std::mutex& ) noexcept;
 
-      void add_items( Item*, const uint32_t& ) noexcept;
+      void add_item( Item&& ) noexcept;
 
       std::optional< Item > pop() noexcept;
 

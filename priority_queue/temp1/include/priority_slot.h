@@ -32,7 +32,7 @@ namespace priority_queue {
 
       Priority_Slot( const uint32_t& ) noexcept;
 
-      void add_items( Item*, const uint32_t& ) noexcept;
+      void add_item( Item&& ) noexcept;
 
       std::optional< Item > pop() noexcept;
 

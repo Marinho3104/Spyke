@@ -4,13 +4,41 @@
 
 #include "item.h"
 #include "priority_slot.h"
-#include <atomic>
-#include <condition_variable>
-#include <cstdint>
-#include <optional>
 #include "smart_pointers.hpp"
+#include <cstdint>
+#include <atomic>
+#include <memory>
+#include <shared_mutex>
 
 namespace priority_queue {
+
+  class Batched_Slot {
+
+    private:
+
+      struct Object {
+
+        public:
+
+          Item item;
+          std::atomic_flag valid;
+
+          Object() noexcept;
+
+      };
+
+    public:
+
+      std::unique_ptr< Object[] > batched_pool;
+      std::atomic< uint32_t > index, actual;
+      std::shared_mutex mutex;
+      const uint32_t pool_size;
+
+      Batched_Slot( const uint32_t& ) noexcept;
+
+      uint32_t reserve_spot() noexcept;
+
+  };
 
   class Priority_Queue {
 
@@ -19,32 +47,31 @@ namespace priority_queue {
       enum State: uint8_t {
         ACTIVE = 0,
         INACTIVE = 1,
-        SEALED = 2
+        SEALED = 2,
+        DEACTIVATED = 3
       };
 
     private:
 
+      const uint8_t max_priority;
+      const uint32_t pool_size;
+
+    private:
+
+      utils::unique_array_with_args_return_type< Batched_Slot > batched_slots;
       utils::unique_array_with_args_return_type< Priority_Slot > slots;
-      mutable std::atomic< uint32_t > items_count;
-      mutable std::atomic< uint32_t > reserved_count;
-      mutable std::condition_variable signal_mut, signal_empty_mut;
-      mutable std::mutex mutex_mut, is_empty_mutex_mut;
-      std::atomic< State > state_mut;
+      std::unique_ptr< std::atomic< uint32_t >[] > global_items; // Number of items already inside the queue or with a reserved spot 
+      std::atomic< State > state = INACTIVE;
 
     private:
-
-      const uint32_t max_items_count;
-      const uint32_t slots_count;
-
-    private:
-
-      void wait_for_item() const noexcept;
-
-      bool is_priority_value_valid( const uint32_t& ) const noexcept;
 
       bool is_active() const noexcept;
       
       bool is_sealed() const noexcept;
+
+      bool is_deactivated() const noexcept;
+
+      void add_batched_items() noexcept;
 
     public:
 
@@ -54,19 +81,17 @@ namespace priority_queue {
 
     public:
 
-      Priority_Queue( const uint32_t&, const uint32_t& ) noexcept;
+      ~Priority_Queue() noexcept;
 
-      Priority_Queue( Priority_Queue&& ) noexcept;
+      Priority_Queue( const uint8_t&, const uint32_t& ) noexcept;
 
       void activate() noexcept;
 
       void seal() noexcept;
 
-      void wait_until_empty() const noexcept;
+      void deactivate() noexcept;
 
       bool add_item( Item, const uint32_t& ) noexcept;
-
-      std::optional< Item > pop() noexcept;
 
   };
 
