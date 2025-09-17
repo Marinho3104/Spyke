@@ -1,0 +1,18 @@
+
+get_filename_component(MODULE_NAME ${CMAKE_CURRENT_LIST_DIR} NAME)
+
+set( COMMON_HEADERS_LIB ${MODULE_NAME}_COMMON_HEADERS_LIB )
+
+add_library(
+
+  ${COMMON_HEADERS_LIB} INTERFACE
+
+)
+
+target_include_directories(
+
+  ${COMMON_HEADERS_LIB} INTERFACE
+
+  ${CMAKE_CURRENT_LIST_DIR}/include/
+
+)

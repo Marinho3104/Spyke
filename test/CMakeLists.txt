@@ -1,0 +1,74 @@
+
+set(
+  EXTERNAL_MODULE_HEADERS_LIB
+
+)
+
+get_filename_component(MODULE_NAME ${CMAKE_CURRENT_LIST_DIR} NAME)
+
+set( COMMON_HEADERS_LIB ${MODULE_NAME}_COMMON_HEADERS_LIB )
+set( SOURCE_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR}/src )
+
+set( 
+
+  ${MODULE_NAME}_COMMON_SOURCES 
+  
+  ${SOURCE_ROOT_DIR}/test.cpp
+
+)
+
+add_library(
+
+  ${MODULE_NAME}_MODULE STATIC
+
+  ${${MODULE_NAME}_COMMON_SOURCES}
+
+)
+
+target_link_libraries(
+
+  ${MODULE_NAME}_MODULE PUBLIC
+
+  ${COMMON_HEADERS_LIB}
+
+)
+
+foreach(MODULE_NAME ${EXTERNAL_MODULE_HEADERS_LIB})
+    target_link_libraries(
+      ${MODULE_NAME}_MODULE PUBLIC
+      ${MODULE_NAME}_COMMON_HEADERS_LIB
+    )
+endforeach()
+
+
+#
+# set(
+#
+#   DIAGNOSTICS_MODULE_COMMON_SOURCES
+#
+#   ## LOG ##
+#   ${DIAGNOSTICS_MODULE_ROOT_DIR}/src/log/log.cpp
+#
+# )
+#
+# add_library(
+#
+#   DIAGNOSTICS_MODULE STATIC
+#
+#   ${DIAGNOSTICS_MODULE_COMMON_SOURCES}
+#
+# )
+#
+# target_link_libraries(
+#
+#   DIAGNOSTICS_MODULE PUBLIC
+#
+#   EXPORT_DIAGNOSTICS_MODULE_COMMON_HEADERS_DIRECTORIES
+#
+# )
+#
+# if( DIAGNOSTICS_MODULE_TESTS )
+#
+#   include( ${DIAGNOSTICS_MODULE_ROOT_DIR}/setup_tests.cmake )
+#
+# endif()
