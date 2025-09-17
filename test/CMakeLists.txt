@@ -39,36 +39,3 @@ foreach(MODULE_NAME ${EXTERNAL_MODULE_HEADERS_LIB})
       ${MODULE_NAME}_COMMON_HEADERS_LIB
     )
 endforeach()
-
-
-#
-# set(
-#
-#   DIAGNOSTICS_MODULE_COMMON_SOURCES
-#
-#   ## LOG ##
-#   ${DIAGNOSTICS_MODULE_ROOT_DIR}/src/log/log.cpp
-#
-# )
-#
-# add_library(
-#
-#   DIAGNOSTICS_MODULE STATIC
-#
-#   ${DIAGNOSTICS_MODULE_COMMON_SOURCES}
-#
-# )
-#
-# target_link_libraries(
-#
-#   DIAGNOSTICS_MODULE PUBLIC
-#
-#   EXPORT_DIAGNOSTICS_MODULE_COMMON_HEADERS_DIRECTORIES
-#
-# )
-#
-# if( DIAGNOSTICS_MODULE_TESTS )
-#
-#   include( ${DIAGNOSTICS_MODULE_ROOT_DIR}/setup_tests.cmake )
-#
-# endif()
