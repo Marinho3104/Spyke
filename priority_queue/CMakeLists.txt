@@ -13,7 +13,7 @@ set(
 
   ${MODULE_NAME}_COMMON_SOURCES 
 
-  ${SOURCE_ROOT_DIR}/test.cpp
+  ${SOURCE_ROOT_DIR}/item.cpp
 
 )
 

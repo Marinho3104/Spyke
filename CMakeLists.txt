@@ -26,8 +26,8 @@ set(
 
   MODULE_NAMES
 
-  test
   diagnostics
+  priority_queue
 
 )
 
