@@ -9,7 +9,7 @@ project(
 
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
-set( CMAKE_CXX_FLAGS "-std=c++17 -Wall -Wextra -Werror" )
+set( CMAKE_CXX_FLAGS "-std=c++20 -Wall -Wextra -Werror" )
 set( CMAKE_BUILD_TYPE Debug )
 
 
