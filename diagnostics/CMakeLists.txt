@@ -1,0 +1,45 @@
+
+set(
+  EXTERNAL_MODULE_HEADERS_LIB
+
+  test
+
+)
+
+get_filename_component(MODULE_NAME ${CMAKE_CURRENT_LIST_DIR} NAME)
+
+set( COMMON_HEADERS_LIB ${MODULE_NAME}_COMMON_HEADERS_LIB )
+set( SOURCE_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR}/src )
+
+set( 
+
+  ${MODULE_NAME}_COMMON_SOURCES 
+
+)
+
+if( ${MODULE_NAME}_COMMON_SOURCES )
+  set( LIB_TYPE STATIC )
+else()
+  set( LIB_TYPE INTERFACE )
+endif()
+
+add_library(
+
+  ${MODULE_NAME}_MODULE ${LIB_TYPE}
+
+)
+
+target_link_libraries(
+
+  ${MODULE_NAME}_MODULE ${LIB_TYPE}
+
+  ${COMMON_HEADERS_LIB}
+
+)
+
+foreach(EXTERNAL_MODULE_NAME ${EXTERNAL_MODULE_HEADERS_LIB})
+    target_link_libraries(
+      ${MODULE_NAME}_MODULE ${LIB_TYPE}
+      ${EXTERNAL_MODULE_NAME}_MODULE
+    )
+endforeach()

@@ -27,6 +27,7 @@ set(
   MODULE_NAMES
 
   test
+  diagnostics
 
 )
 
