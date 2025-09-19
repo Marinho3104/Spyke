@@ -2,8 +2,6 @@
 set(
   EXTERNAL_MODULE_HEADERS_LIB
 
-  test
-
 )
 
 get_filename_component(MODULE_NAME ${CMAKE_CURRENT_LIST_DIR} NAME)
@@ -18,16 +16,25 @@ set(
 )
 
 if( ${MODULE_NAME}_COMMON_SOURCES )
-  set( LIB_TYPE STATIC )
+
+  set( LIB_TYPE PUBLIC )
+
+  add_library(
+    ${MODULE_NAME}_MODULE STATIC
+    ${${MODULE_NAME}_COMMON_SOURCES}
+  )
+
 else()
+
   set( LIB_TYPE INTERFACE )
+
+  add_library(
+
+    ${MODULE_NAME}_MODULE ${LIB_TYPE}
+
+  )
+
 endif()
-
-add_library(
-
-  ${MODULE_NAME}_MODULE ${LIB_TYPE}
-
-)
 
 target_link_libraries(
 
