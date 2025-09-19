@@ -12,30 +12,43 @@ set( SOURCE_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR}/src )
 set( 
 
   ${MODULE_NAME}_COMMON_SOURCES 
-  
+
   ${SOURCE_ROOT_DIR}/test.cpp
 
 )
 
-add_library(
+if( ${MODULE_NAME}_COMMON_SOURCES )
 
-  ${MODULE_NAME}_MODULE STATIC
+  set( LIB_TYPE PUBLIC )
 
-  ${${MODULE_NAME}_COMMON_SOURCES}
+  add_library(
+    ${MODULE_NAME}_MODULE STATIC
+    ${${MODULE_NAME}_COMMON_SOURCES}
+  )
 
-)
+else()
+
+  set( LIB_TYPE INTERFACE )
+
+  add_library(
+
+    ${MODULE_NAME}_MODULE ${LIB_TYPE}
+
+  )
+
+endif()
 
 target_link_libraries(
 
-  ${MODULE_NAME}_MODULE PUBLIC
+  ${MODULE_NAME}_MODULE ${LIB_TYPE}
 
   ${COMMON_HEADERS_LIB}
 
 )
 
-foreach(MODULE_NAME ${EXTERNAL_MODULE_HEADERS_LIB})
+foreach(EXTERNAL_MODULE_NAME ${EXTERNAL_MODULE_HEADERS_LIB})
     target_link_libraries(
-      ${MODULE_NAME}_MODULE PUBLIC
-      ${MODULE_NAME}_COMMON_HEADERS_LIB
+      ${MODULE_NAME}_MODULE ${LIB_TYPE}
+      ${EXTERNAL_MODULE_NAME}_MODULE
     )
 endforeach()
