@@ -49,6 +49,8 @@ foreach(module_name IN LISTS MODULE_NAMES)
 
   string(TOUPPER "${module_name}" MODULE_NAME_UPPERCASE)
 
+  include( ${CMAKE_SOURCE_DIR}/${module_name}/demos.cmake )
+
   if( ${MODULE_NAME_UPPERCASE}_TESTS_ENABLE )
     include( ${CMAKE_SOURCE_DIR}/${module_name}/tests.cmake )
   endif()
