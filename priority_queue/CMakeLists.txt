@@ -2,6 +2,8 @@
 set(
   EXTERNAL_MODULE_HEADERS_LIB
 
+  diagnostics
+
 )
 
 get_filename_component(MODULE_NAME ${CMAKE_CURRENT_LIST_DIR} NAME)

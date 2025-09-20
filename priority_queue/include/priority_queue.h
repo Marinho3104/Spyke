@@ -6,6 +6,9 @@ namespace priority_queue {
 
   class Priority_Queue {
 
+    private:
+
+
 
 
   };
