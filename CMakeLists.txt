@@ -28,6 +28,7 @@ set(
 
   diagnostics
   priority_queue
+  utils
 
 )
 

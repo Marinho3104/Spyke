@@ -2,9 +2,6 @@
 set(
   EXTERNAL_MODULE_HEADERS_LIB
 
-  diagnostics
-  utils
-
 )
 
 get_filename_component(MODULE_NAME ${CMAKE_CURRENT_LIST_DIR} NAME)
@@ -15,8 +12,6 @@ set( SOURCE_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR}/src )
 set( 
 
   ${MODULE_NAME}_COMMON_SOURCES 
-
-  ${SOURCE_ROOT_DIR}/item.cpp
 
 )
 
