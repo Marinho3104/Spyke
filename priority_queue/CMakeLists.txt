@@ -17,6 +17,7 @@ set(
   ${MODULE_NAME}_COMMON_SOURCES 
 
   ${SOURCE_ROOT_DIR}/item.cpp
+  ${SOURCE_ROOT_DIR}/priority_slot.cpp
 
 )
 

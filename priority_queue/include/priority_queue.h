@@ -16,10 +16,21 @@ namespace priority_queue {
 
       std::array< Priority_Slot, MAX_PRIORITY > queue;
 
+    public:
 
+      Priority_Queue() = delete;
+
+      Priority_Queue( const Priority_Queue& ) = delete;
+
+      explicit Priority_Queue( const uint32_t& ) noexcept;
 
   };
 
 } // namespace priority_queue
 
+#ifdef ENABLE_TEMPLATE_COMPILATION
+  #include "priority_queue.hpp"
+#endif
+
 #endif // PRIORITY_QUEUE_INCLUDE_PRIORITY_QUEUE_H
+
