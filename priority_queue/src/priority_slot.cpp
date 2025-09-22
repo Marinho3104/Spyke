@@ -27,11 +27,13 @@ uint32_t priority_queue::Priority_Slot::get_entry_index() const noexcept {
 
 }
 
-void priority_queue::Priority_Slot::push( std::unique_ptr< Item >&& item ) noexcept {
+bool priority_queue::Priority_Slot::push( std::unique_ptr< Item >&& item ) noexcept {
 
   const uint32_t index = get_entry_index();
 
   entries.get()[ index ].item = std::move( item );
   entries.get()[ index ].valid.test_and_set( std::memory_order_relaxed );
+
+  return true;
 
 }

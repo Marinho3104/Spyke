@@ -41,7 +41,7 @@ namespace priority_queue {
 
       explicit Priority_Slot( const uint32_t& ) noexcept;
 
-      void push( std::unique_ptr< Item >&& ) noexcept;
+      bool push( std::unique_ptr< Item >&& ) noexcept;
 
 
   };

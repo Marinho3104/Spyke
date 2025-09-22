@@ -16,6 +16,10 @@ namespace priority_queue {
 
       std::array< Priority_Slot, MAX_PRIORITY > queue;
 
+    private:
+
+      bool is_priority_valid( const uint8_t& ) const noexcept;
+
     public:
 
       Priority_Queue() = delete;
@@ -23,6 +27,8 @@ namespace priority_queue {
       Priority_Queue( const Priority_Queue& ) = delete;
 
       explicit Priority_Queue( const uint32_t& ) noexcept;
+
+      bool push( const uint8_t&, std::unique_ptr< Item >&& ) noexcept;
 
   };
 
