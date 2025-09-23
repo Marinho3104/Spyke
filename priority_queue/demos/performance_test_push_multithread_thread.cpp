@@ -7,19 +7,19 @@
 #include <thread>
 #include <vector>
 
-const uint32_t MAX_PRIORITY = 12;
-const uint32_t QUEUE_SIZE = 1000000;
+const uint32_t MAX_PRIORITY = 20;
+const uint32_t QUEUE_SIZE = 2 << 20;
 const uint32_t ITEMS_COUNT = 1000000;
 const uint32_t ITERATIONS = 5;
-const uint32_t THREAD_COUNT = 12;
- 
+const uint32_t THREAD_COUNT = 20;
+
 struct ItemAndPriority {
   std::unique_ptr< priority_queue::Item > item;
   uint32_t priority;
 };
 
 int main () {
-  
+
   LOG_INFO("*** MULTI THREAD PERFORMANCE TESTS FOR PUSH ***");
 
   std::srand(std::time(nullptr));
@@ -29,8 +29,8 @@ int main () {
 
   for( uint32_t i = 0; i < ITERATIONS; i++ ) {
 
-    priority_queue::Priority_Queue< MAX_PRIORITY > queue = priority_queue::Priority_Queue< MAX_PRIORITY >( QUEUE_SIZE );
-  
+    priority_queue::Priority_Queue< MAX_PRIORITY, THREAD_COUNT > queue = priority_queue::Priority_Queue< MAX_PRIORITY, THREAD_COUNT >( QUEUE_SIZE );
+
     double times_per_thread[ THREAD_COUNT ] = { 0 };
 
     auto add_items_fun = [ &queue, &times_per_thread ]( uint32_t thread_index ) {
@@ -40,7 +40,7 @@ int main () {
           payloads.push_back( 
               { 
                 .item = std::make_unique< priority_queue::Item >( std::make_unique< uint8_t[] >( 8 ), 8 ), 
-                .priority = std::rand() % MAX_PRIORITY
+                .priority = thread_index
               }
             );
       };
@@ -48,7 +48,7 @@ int main () {
       auto start = std::chrono::high_resolution_clock::now();
 
       for( auto& payload : payloads ) {
-        queue.push( payload.priority, std::move( payload.item ) );
+        queue.push( thread_index, payload.priority, std::move( payload.item ) );
       }
 
       auto end = std::chrono::high_resolution_clock::now();
@@ -57,7 +57,7 @@ int main () {
       times_per_thread[ thread_index ] = elapsed_seconds.count();
 
     }; 
-    
+
     std::thread add_threads[ THREAD_COUNT ];
     for( uint32_t i = 0; i < THREAD_COUNT; i++ ) {
       add_threads[ i ] = std::thread( add_items_fun, i );
@@ -69,7 +69,7 @@ int main () {
 
     double sum = 0;
     double max = 0;
-    for( uint32_t i = 0; i < ITERATIONS; i++ ) {
+    for( uint32_t i = 0; i < THREAD_COUNT; i++ ) {
       sum += times_per_thread[ i ];
       max = std::max( max, times_per_thread[ i ] );
     }

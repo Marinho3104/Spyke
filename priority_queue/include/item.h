@@ -19,6 +19,8 @@ namespace priority_queue {
 
       Item( const Item& ) = delete;
 
+      explicit Item() noexcept;
+
       explicit Item( std::unique_ptr< uint8_t[] >&&, const uint64_t& ) noexcept;
 
       explicit Item( Item&& ) noexcept;

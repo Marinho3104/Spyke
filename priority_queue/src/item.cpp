@@ -2,6 +2,8 @@
 #include "item.h"
 
 
+priority_queue::Item::Item() noexcept : data( nullptr ), size( 0 ) {}
+
 priority_queue::Item::Item( std::unique_ptr< uint8_t[] >&& data, const uint64_t& size ) noexcept : data( std::move( data ) ), size( size ) {}
 
 priority_queue::Item::Item( Item&& other ) noexcept : data( std::move( other.data ) ), size( other.size ) {}
