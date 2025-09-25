@@ -30,6 +30,9 @@ namespace priority_queue {
 
       bool push( const uint8_t&, const uint8_t&, std::unique_ptr< Item >&& ) noexcept;
 
+      template< uint32_t POP_QUEUE_SIZE >
+      uint32_t pop( std::array< Item, POP_QUEUE_SIZE >& ) noexcept;
+
   };
 
 } // namespace priority_queue

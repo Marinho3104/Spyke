@@ -15,24 +15,24 @@ namespace priority_queue {
     private:
 
       std::array< Priority_Slot, MAX_PRIORITY > queue;
-      mutable std::atomic_flag lock;
+
+      template< uint8_t MAX_PRIORITY_PRIORITY_QUEUE, uint8_t PUSH_THREADS_COUNT >
+      friend class Priority_Queue;
 
     private:
-
-      void wait() const noexcept;
-
-      void release() const noexcept;
-
-    public:
 
       Push_Worker() = delete;
 
       Push_Worker( const Push_Worker& ) = delete;
 
-      explicit Push_Worker( const uint32_t& ) noexcept;
-
       bool push( const uint8_t&, std::unique_ptr< Item >&& ) noexcept;
 
+      template< uint32_t POP_QUEUE_SIZE >
+      uint32_t pop( std::array< Item, POP_QUEUE_SIZE >&, const uint32_t& ) noexcept;
+
+    public:
+
+      explicit Push_Worker( const uint32_t& ) noexcept;
 
   };
 

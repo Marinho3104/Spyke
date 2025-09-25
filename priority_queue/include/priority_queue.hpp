@@ -1,4 +1,5 @@
 
+#include <cstdint>
 #ifndef ENABLE_TEMPLATE_COMPILATION
   #include "priority_queue.h"
 #endif
@@ -26,6 +27,13 @@ bool priority_queue::Priority_Queue< MAX_PRIORITY, PUSH_THREADS_COUNT >::push( c
   return push_workers.at( push_worker_id ).push( priority, std::move( item ) );
 }
 
+template< uint8_t MAX_PRIORITY, uint8_t PUSH_THREADS_COUNT >
+template< uint32_t POP_QUEUE_SIZE >
+uint32_t priority_queue::Priority_Queue< MAX_PRIORITY, PUSH_THREADS_COUNT >::pop( std::array< Item, POP_QUEUE_SIZE >& pop_queue ) noexcept {
+  return push_workers.at( 0 ).template pop< POP_QUEUE_SIZE >( pop_queue, 0 );
+}
+
 #ifndef ENABLE_TEMPLATE_COMPILATION
   template class priority_queue::Priority_Queue< 0, 0 >;
+  template uint32_t priority_queue::Priority_Queue< 0, 0 >::pop< 0 >( std::array< priority_queue::Item, 0 >& );
 #endif

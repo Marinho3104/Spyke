@@ -7,11 +7,11 @@
 #include <thread>
 #include <vector>
 
-const uint32_t MAX_PRIORITY = 20;
+const uint32_t MAX_PRIORITY = 16;
 const uint32_t QUEUE_SIZE = 2 << 20;
 const uint32_t ITEMS_COUNT = 1000000;
 const uint32_t ITERATIONS = 5;
-const uint32_t THREAD_COUNT = 20;
+const uint32_t THREAD_COUNT = 16;
 
 struct ItemAndPriority {
   std::unique_ptr< priority_queue::Item > item;

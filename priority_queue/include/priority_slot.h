@@ -3,6 +3,7 @@
 #define PRIORITY_QUEUE_INCLUDE_PRIORITY_SLOT_H
 
 #include "item.h"
+#include <atomic>
 #include <cstdint>
 #include <memory>
 
@@ -14,12 +15,9 @@ namespace priority_queue {
     private:
 
       std::unique_ptr< Item[] > entries;
-      mutable uint_fast32_t entries_head, entries_tail;
+      std::atomic< Item* > queue_tail_address, queue_head_address;
+      const Item* queue_limit;
       const uint32_t queue_size;
-
-    private:
-
-      uint32_t get_entry_index() const noexcept;
 
     public:
 
@@ -30,6 +28,9 @@ namespace priority_queue {
       explicit Priority_Slot( const uint32_t& ) noexcept;
 
       bool push( std::unique_ptr< Item >&& ) noexcept;
+
+      template< uint32_t POP_QUEUE_SIZE >
+      uint32_t pop( std::array< Item, POP_QUEUE_SIZE >&, const uint32_t& ) noexcept;
 
   };
   
