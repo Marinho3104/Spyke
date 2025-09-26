@@ -3,6 +3,10 @@
 #ifndef DIAGNOSTICS_INCLUDE_VALIDATION_H_
 #define DIAGNOSTICS_INCLUDE_VALIDATION_H_
 
+#include "cstdlib"
+#include "log.h"
+
+
 // If the condition fails it will stop the execution of the program
 #define ENSURE( condition, fmt, ... ) \
   if( ! ( condition ) ) { \

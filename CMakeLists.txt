@@ -22,6 +22,10 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_BIN_DIR} )
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BUILD_LIB_DIR} )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${BUILD_LIB_DIR} )
 
+# Flag to invert includes for template implementations and definitions.
+# Needed for compilation, but should be ignored by the LSP to avoid errors.
+add_compile_definitions( -DENABLE_TEMPLATE_COMPILATION )
+
 set(
 
   MODULE_NAMES
