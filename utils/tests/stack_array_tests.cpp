@@ -1,6 +1,6 @@
 
 #include <cassert>
-#include "stack_array.h"
+#include "stack_array.hpp"
 
 int main() {
 
