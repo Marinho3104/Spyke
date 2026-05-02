@@ -1,3 +1,6 @@
+mod network;
+
 fn main() {
-    println!("Hello, world!");
+    let a = network::packet::Packet::new(1, vec![1]);
+    println!("{:?}", a);
 }
