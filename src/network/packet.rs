@@ -1,34 +1,41 @@
+use serde::{ Deserialize, Serialize };
+
+pub(crate) const MAX_PAYLOAD_SIZE: usize = 512;
+
 use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub(crate) enum PacketError {
-    #[error("Packet payload is too large: {actual} > {max}")]
-    PayloadTooLarge {
-	actual: usize,
-	max: usize
-    }
+
+    #[error("Payload is too big: {actual_payload_size} > {MAX_PAYLOAD_SIZE}")]
+    PayloadTooBig {
+        actual_payload_size: usize,
+    },
+
 }
 
-
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub(crate) struct Packet {
     protocol_id: u16,
-    payload: Vec<u8>,
+    payload: Vec<u8>
 }
 
 impl Packet {
 
-    pub(crate) const MAX_PAYLOAD_SIZE: usize = 512;
-
     pub(crate) fn new(protocol_id: u16, payload: Vec<u8>) -> Result<Packet, PacketError> {
-	let payload_length = payload.len();
-	if payload_length > Packet::MAX_PAYLOAD_SIZE {
-	    return Err(PacketError::PayloadTooLarge { actual: payload_length, max: Packet::MAX_PAYLOAD_SIZE });
-	}
-	Ok(Self {
-	    protocol_id,
-	    payload
-	})
+
+        if payload.len() > MAX_PAYLOAD_SIZE {
+            return Err(
+                PacketError::PayloadTooBig { actual_payload_size: payload.len() }
+            )
+        }
+
+	Ok(
+            Self {
+	        protocol_id,
+	        payload: payload
+	    }
+        )
     }
 
     pub(crate) fn protocol_id(&self) -> u16 {
@@ -47,21 +54,19 @@ mod tests {
 
     #[test]
     fn test_packet_creation_success() {
-	let protocol_id = 1;
-	let payload = vec![0; 128];
-	let packet_result = Packet::new(protocol_id, payload.clone());
-	let packet = packet_result.unwrap();
+	let protocol_id: u16 = 1;
+        let payload = vec![0];
+        let payload_copy = payload.clone();
+	let packet = Packet::new(protocol_id, payload).expect("Expected Ok packet");
 	assert_eq!(packet.protocol_id(), protocol_id);
-	assert_eq!(packet.payload(), &payload);
+	assert_eq!(*packet.payload(), payload_copy);
     }
- 
+
     #[test]
-    fn test_packet_creation_error_payload_too_large() {
-	let payload_length = Packet::MAX_PAYLOAD_SIZE + 1;
-	let payload = vec![0; payload_length];
-	match Packet::new(1, payload.clone()) {
-	    Err(PacketError::PayloadTooLarge { actual, max: _ }) => assert_eq!(actual, payload_length),
-	    other => panic!("Expecting Err(PacketError::PayloadToLarge), instead got {:?}", other)
-	}
-    }   
+    fn test_packet_creation_payload_too_big_error() {
+	let protocol_id: u16 = 1;
+        let payload = vec![0; MAX_PAYLOAD_SIZE + 1];
+	let packet = Packet::new(protocol_id, payload);
+        assert!(packet.is_err());
+    }
 }
