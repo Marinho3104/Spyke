@@ -12,6 +12,11 @@ pub(crate) enum PacketError {
         actual_payload_size: usize,
     },
 
+    #[error("Packet serialization error: {error_message}")]
+    PacketSerializationError {
+        error_message: String
+    }
+
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -46,6 +51,20 @@ impl Packet {
 	&self.payload
     }
 
+    pub(crate) fn serialized(&self) -> Result<Vec<u8>, PacketError> {
+        let serialized_packet = postcard::to_allocvec(self)
+            .map_err(|err| PacketError::PacketSerializationError { error_message: err.to_string() })?;
+
+        // This is safe as long as the vec max size stays 512 MAX
+        let serialized_packet_size: u16 = u16::try_from(serialized_packet.len()).unwrap();        
+
+        let mut serialized_data = serialized_packet_size.to_le_bytes().to_vec();
+
+        serialized_data.extend(serialized_packet);
+
+        Ok( serialized_data )
+    }
+
 }
 
 #[cfg(debug_assertions)]
@@ -69,4 +88,14 @@ mod tests {
 	let packet = Packet::new(protocol_id, payload);
         assert!(packet.is_err());
     }
+
+    #[test]
+    fn test_packet_serialization_success() {
+	let protocol_id: u16 = 1;
+        let payload = vec![0];
+	let packet = Packet::new(protocol_id, payload).expect("Expected Ok packet");
+        let serialized_data = packet.serialized();
+        assert!(serialized_data.is_ok());
+    }
+
 }
