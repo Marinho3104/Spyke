@@ -1,3 +1,3 @@
-mod network;
+mod node;
 
 fn main() {}
