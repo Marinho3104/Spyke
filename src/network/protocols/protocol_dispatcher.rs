@@ -6,20 +6,20 @@ use thiserror::Error;
 pub(crate) enum ProtocolDispatcherError {
 
     // USED BY PROTOCOL DISPATCHER TRY FROM //
-    #[error("Unknown protocol id: {protocol_id}")]
+    #[error("Unknown protocol: {protocol_id}")]
     UnknownProtocolId {
-        protocol_id: u16,
+        protocol: ProtocolId,
     },
 
     // USED BY EACH PROTOCOL TRY FROM //
     #[error("Unexpected payload for protocol id: {protocol_id}. Error: {error_message}")]
     UnexpectedPayload {
-        protocol_id: u16,
+        protocol: ProtocolId,
         error_message: String
     },
     #[error("Unexpected protocol id: {protocol_id}, expecting {expecting_protocol_id:?}")]
     UnexpectedProtocolId {
-        protocol_id: u16,
+        protocol: ProtocolId,
         expecting_protocol_id: ProtocolId
     }
 
