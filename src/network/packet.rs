@@ -1,6 +1,8 @@
+use std::time::Duration;
+
 use serde::{ Deserialize, Serialize };
 use thiserror::Error;
-use tokio::{io::AsyncReadExt, net::TcpStream};
+use tokio::{io::AsyncReadExt, net::TcpStream, time::timeout};
 
 use crate::network::protocols::protocol_id::ProtocolId;
 
@@ -32,11 +34,40 @@ pub(crate) enum PacketError {
         error_message: String
     },
 
+    #[error("Deserialization timeout on read size")]
+    DeserializationTimeoutOnReadSize {},
+
+    #[error("Deserialization timeout on read data")]
+    DeserializationTimeoutOnReadData {},
+
     #[error("Packet deserialization error: {error_message}")]
     PacketDeserializationError {
         error_message: String
     }
 
+}
+
+pub(crate) struct ReadPacketTimeouts {
+    read_size_timeout: u64,
+    read_data_timeout: u64
+}
+
+impl ReadPacketTimeouts {
+    
+    fn new(read_size_timeout: u64, read_data_timeout: u64) -> Self {
+        Self {
+            read_size_timeout,
+            read_data_timeout
+        }
+    }
+
+
+    fn default() -> Self {
+        Self {
+            read_size_timeout: 60000,
+            read_data_timeout: 5000
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
@@ -130,16 +161,26 @@ impl Packet {
         Ok(serialized_data)
     }
 
-    pub(crate) async fn read_packet(stream: &mut TcpStream) -> Result<Packet, PacketError> {
-        let packet_size = stream.read_u16_le()
+    pub(crate) async fn read_packet(stream: &mut TcpStream, timeouts: Option<ReadPacketTimeouts>) -> Result<Packet, PacketError> {
+        let timeouts = timeouts.unwrap_or(ReadPacketTimeouts::default());
+
+        let packet_size = timeout(
+                Duration::from_millis(timeouts.read_size_timeout),
+                stream.read_u16_le()
+            )
             .await
+            .map_err(|_| PacketError::DeserializationTimeoutOnReadSize {  } )?
             .map_err(|err| PacketError::StreamReadIssue { error_message: err.to_string() })?
             as usize;
 
         let mut packet_data = vec![0u8; packet_size];
 
-        stream.read_exact(&mut packet_data)
+        timeout(
+                Duration::from_millis(timeouts.read_data_timeout),
+                stream.read_exact(&mut packet_data)
+        )
             .await
+            .map_err(|_| PacketError::DeserializationTimeoutOnReadData {  })?
             .map_err(|err| PacketError::StreamReadIssue { error_message: err.to_string() })?;
 
         let packet: Packet = postcard::from_bytes(&packet_data)
@@ -152,12 +193,23 @@ impl Packet {
 
 #[cfg(debug_assertions)]
 mod tests {
-    use super::*;
+    use tokio::{io::AsyncWriteExt, net::TcpListener};
+
+use super::*;
 
     #[test]
     fn test_packet_headers_creation_success() {
-        let headers = PacketHeader::new(rand::random(), ProtocolId::DisconnectProtocol, 0, 1);
-        assert!(headers.is_ok());
+        let packet_id = rand::random();
+        let protocol_id = ProtocolId::DisconnectProtocol;
+        let sequence_index = 0;
+        let sequence_total = 1;
+        let headers_result = PacketHeader::new(packet_id, protocol_id, sequence_index, sequence_total);
+        assert!(headers_result.is_ok());
+        let headers = headers_result.unwrap();
+        assert_eq!(headers.id(), packet_id);
+        assert_eq!(headers.protocol_id(), protocol_id);
+        assert_eq!(headers.sequence_total(), sequence_total);
+        assert_eq!(headers.sequence_index(), sequence_index);
     }
 
     #[test]
@@ -194,13 +246,129 @@ mod tests {
         assert!(serialized_data.is_ok());
     }
 
-    fn test_packet_deserialization_success() {
-        let headers = PacketHeader::new(rand::random(), ProtocolId::DisconnectProtocol, 0, 1).expect("Expected Ok packet headers");
-        let headers_copy = headers.clone();
-        let payload = vec![0];
+    #[tokio::test]
+    async fn test_read_packet_success() {
+        let listener = TcpListener::bind("127.0.0.1:0")
+            .await
+            .expect("Expected Ok: Server bind");
+
+        let addr = listener
+            .local_addr()
+            .expect("Expected Ok: Get server address");
+
+        let server = tokio::spawn(async move {
+            let (stream, _) = listener
+                .accept()
+                .await
+                .expect("Expected Ok: Server accept connection");
+
+            stream
+        });
+
+        let mut client_stream = TcpStream::connect(addr)
+            .await
+            .expect("Expected Ok: Client connect to server");
+
+        let mut server_stream = server
+            .await
+            .expect("Expected Ok: Server task");
+
+        let packet_id = rand::random();
+        let protocol_id = ProtocolId::DisconnectProtocol;
+        let sequence_index = 1;
+        let sequence_total = 10;
+        let headers = PacketHeader::new(packet_id, protocol_id, sequence_index, sequence_total).expect("Expected Ok Headers");
+        let payload = vec![0; 0];
 	let packet = Packet::new(headers, payload).expect("Expected Ok packet");
-	let packet_copy = packet.clone();
         let serialized_data = packet.serialized().expect("Expected Ok serialized data");
+
+        server_stream
+            .write_all(&serialized_data)
+            .await
+            .expect("Expected Ok Write All");
+
+        let packet_result = Packet::read_packet(&mut client_stream, None).await;
+
+        assert!(packet_result.is_ok());
+
+        let packet = packet_result.unwrap();
+        let headers = packet.headers();
+
+        assert_eq!(headers.id(), packet_id);
+        assert_eq!(headers.protocol_id(), protocol_id);
+        assert_eq!(headers.sequence_total(), sequence_total);
+        assert_eq!(headers.sequence_index(), sequence_index);
+
+        assert_eq!(packet.payload().len(), 0);
     }
 
+    #[tokio::test]
+    async fn test_read_packet_stream_read_error() {
+        let listener = TcpListener::bind("127.0.0.1:0")
+            .await
+            .expect("Expected Ok: Server bind");
+
+        let addr = listener
+            .local_addr()
+            .expect("Expected Ok: Get server address");
+
+        tokio::spawn(async move {
+            let (stream, _) = listener
+                .accept()
+                .await
+                .expect("Expected Ok: Server accept connection");
+
+            stream
+        });
+
+        let mut client_stream = TcpStream::connect(addr)
+            .await
+            .expect("Expected Ok: Client connect to server");
+
+        let packet_result = Packet::read_packet(
+                &mut client_stream, 
+                None
+            )
+            .await;
+
+        assert!(packet_result.is_err());
+        assert!(matches!(packet_result.unwrap_err(), PacketError::StreamReadIssue { .. }))
+    }
+
+    #[tokio::test]
+    async fn test_read_packet_timeout_error() {
+        let listener = TcpListener::bind("127.0.0.1:0")
+            .await
+            .expect("Expected Ok: Server bind");
+
+        let addr = listener
+            .local_addr()
+            .expect("Expected Ok: Get server address");
+
+        let server = tokio::spawn(async move {
+            let (stream, _) = listener
+                .accept()
+                .await
+                .expect("Expected Ok: Server accept connection");
+
+            stream
+        });
+
+        let mut client_stream = TcpStream::connect(addr)
+            .await
+            .expect("Expected Ok: Client connect to server");
+
+        let mut server_stream = server
+            .await
+            .expect("Expected Ok: Server task");
+
+        let packet_result = Packet::read_packet(
+                &mut client_stream, 
+                Some(ReadPacketTimeouts::new(500, 500))
+            )
+            .await;
+
+        assert!(packet_result.is_err());
+        assert!(matches!(packet_result.unwrap_err(), PacketError::DeserializationTimeoutOnReadSize {  }))
+    }
 }
