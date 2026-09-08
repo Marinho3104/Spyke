@@ -336,7 +336,7 @@ use super::*;
     }
 
     #[tokio::test]
-    async fn test_read_packet_timeout_error() {
+    async fn test_read_packet_size_timeout_error() {
         let listener = TcpListener::bind("127.0.0.1:0")
             .await
             .expect("Expected Ok: Server bind");
@@ -371,4 +371,49 @@ use super::*;
         assert!(packet_result.is_err());
         assert!(matches!(packet_result.unwrap_err(), PacketError::DeserializationTimeoutOnReadSize {  }))
     }
+
+    #[tokio::test]
+    async fn test_read_packet_data_timeout_error() {
+        let listener = TcpListener::bind("127.0.0.1:0")
+            .await
+            .expect("Expected Ok: Server bind");
+
+        let addr = listener
+            .local_addr()
+            .expect("Expected Ok: Get server address");
+
+        let server = tokio::spawn(async move {
+            let (stream, _) = listener
+                .accept()
+                .await
+                .expect("Expected Ok: Server accept connection");
+
+            stream
+        });
+
+        let mut client_stream = TcpStream::connect(addr)
+            .await
+            .expect("Expected Ok: Client connect to server");
+
+        let mut server_stream = server
+            .await
+            .expect("Expected Ok: Server task");
+
+        let size_data = [0xff, 0x00];
+        server_stream
+            .write_all(&size_data)
+            .await
+            .expect("Expected Ok Write All");
+
+        let packet_result = Packet::read_packet(
+                &mut client_stream, 
+                Some(ReadPacketTimeouts::new(500, 500))
+            )
+            .await;
+
+        assert!(packet_result.is_err());
+        assert!(matches!(packet_result.unwrap_err(), PacketError::DeserializationTimeoutOnReadData {  }))
+    }
+
+
 }

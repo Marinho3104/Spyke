@@ -1,5 +1,7 @@
-use crate::network::protocols::protocol_id::ProtocolId;
+use crate::network::{packet::Packet, protocols::{protocol_dispatcher::ProtocolDispatcher, protocol_id::ProtocolId}};
 
-pub(crate) trait Protocol {
+pub(crate) trait Protocol: TryFrom<Vec<Packet>> {
     const PROTOCOL_ID: ProtocolId;
+
+    fn max_total_sequence() -> u16;
 }
